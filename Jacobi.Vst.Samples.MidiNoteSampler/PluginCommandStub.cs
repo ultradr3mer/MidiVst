@@ -14,7 +14,7 @@ namespace Jacobi.Vst.Samples.MidiNoteSampler
         /// <returns>Never returns null.</returns>
         protected override IVstPlugin CreatePluginInstance()
         {
-            return new Plugin(this);
+            return new Plugin();
         }
     }
 }

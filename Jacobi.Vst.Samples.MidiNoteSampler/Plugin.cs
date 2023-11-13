@@ -4,6 +4,7 @@ using Jacobi.Vst.Plugin.Framework.Plugin;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
+using VstNetAudioPlugin;
 
 namespace Jacobi.Vst.Samples.MidiNoteSampler
 {
@@ -12,16 +13,14 @@ namespace Jacobi.Vst.Samples.MidiNoteSampler
   /// </summary>
   internal sealed class Plugin : VstPluginWithServices
   {
-    private PluginCommandStub pluginCommandStub;
-
     /// <summary>
     /// Constructs a new instance.
     /// </summary>
-    public Plugin(PluginCommandStub pluginCommandStub)
+    public Plugin()
         : base("VST.NET 2 Midi Note Sampler", 36373435,
             new VstProductInfo("VST.NET 2 Code Samples", "Jacobi Software © 2008-2020", 2001),
             VstPluginCategory.Synth)
-    { this.pluginCommandStub = pluginCommandStub; }
+    { }
 
     protected override void ConfigureServices(IServiceCollection services)
     {
@@ -46,11 +45,12 @@ namespace Jacobi.Vst.Samples.MidiNoteSampler
       //Jacobi.Vst.Samples.MidiNoteSampler.MidiProcessor
       //Jacobi.Vst.Plugin.Framework.IVstMidiProcessor
 
-      services.AddSingleton(this.pluginCommandStub)
+      services.AddSingleton<PluginParameters>()
                 .AddSingleton<VstMidiProgram>()
                 .AddSingleton<Generator>()
                 .AddSingletonAll<AudioProcessor>()
-                .AddSingletonAll<MidiProcessor>();
+                .AddSingletonAll<MidiProcessor>()
+                .AddSingletonAll<PluginEditor>();
     }
   }
 }
