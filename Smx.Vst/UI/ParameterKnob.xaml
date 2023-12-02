@@ -5,18 +5,21 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Smx.Vst.UI"
              mc:Ignorable="d" 
-             Height="40" Width="300">
-    <Grid >
+             Height="60" Width="300">
+  <UserControl.Resources>
+    <ResourceDictionary Source="/Smx.Vst;component/UI/StyleDictionary.xaml"/>
+  </UserControl.Resources>
+  <Grid >
     <Grid.RowDefinitions>
-      <RowDefinition Height="*"/>
-      <RowDefinition Height="*"/>
+      <RowDefinition Height="30"/>
+      <RowDefinition Height="30"/>
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*"/>
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
-    <Label x:Name="label" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Content="{Binding Label, Mode=OneWay}" Foreground="White" Padding="0"/>
-    <TextBox x:Name="textBox" HorizontalAlignment="Right" Width="120" Grid.Row="0" Text="{Binding ValueString, Mode=OneWay}" IsReadOnly="True" Grid.Column="1" Background="DarkGray"/>
+    <Label x:Name="label" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Content="{Binding Label, Mode=OneWay}" Padding="0"/>
+    <TextBox x:Name="textBox" HorizontalAlignment="Right" Width="120" Grid.Row="0" Text="{Binding ValueString, Mode=OneWay}" IsReadOnly="True" Grid.Column="1" />
     <Slider Visibility="{Binding SliderVisibility}" IsSnapToTickEnabled="False" Minimum="0" Maximum="1" x:Name="slider" HorizontalAlignment="Stretch" VerticalAlignment="Top" Value="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" Grid.ColumnSpan="2"/>
     <CheckBox Visibility="{Binding CheckboxVisibility}" HorizontalAlignment="Left" Grid.Row="2" IsChecked="{Binding IsValue, UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="2" />
   </Grid>

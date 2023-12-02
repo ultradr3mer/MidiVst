@@ -4,17 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using VstNetAudioPlugin;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Smx.Vst.Smx
 {
   internal class SmxGenerator
   {
-    public long sampleIndex = 0;
     private const double a4Frequency = 440.0;
     private static readonly double multiplyer = Math.Pow(2, 1.0 / 12.0);
     private static readonly Dictionary<int, float> noteFrequencies = Enumerable.Range(0, 127).ToDictionary(x => x, x => (float)(a4Frequency * Math.Pow(multiplyer, x - 69)));
     private readonly SmxParameters parameters;
-    private Dictionary<byte, float> actuationDictionary = new Dictionary<byte, float>();
+    private Dictionary<byte, KeyData> keyDataDict = new Dictionary<byte, KeyData>();
     private HashSet<byte> keys = new HashSet<byte>();
 
     public SmxGenerator(PluginParameters parameters)
@@ -22,7 +22,7 @@ namespace Smx.Vst.Smx
       this.parameters = parameters.SmxParameters;
     }
 
-    public bool IsPlaying => keys.Any() || actuationDictionary.Any();
+    public bool IsPlaying => keys.Any() || keyDataDict.Any();
 
     internal void Generate(float sampleRate, VstAudioBuffer[] outChannels)
     {
@@ -31,26 +31,37 @@ namespace Smx.Vst.Smx
       {
         foreach (var key in keys)
         {
-          if (!actuationDictionary.TryGetValue(key, out float keyActuation))
+          if (!keyDataDict.TryGetValue(key, out KeyData keyActuation))
           {
-            keyActuation = 0;
+            keyActuation = new KeyData() { Actuation = 0, Detune = (float)Math.Pow(parameters.IniDetMgr.CurrentValue * 2.0f,2.0) };
+            keyDataDict[key] = keyActuation;
           }
 
-          if (keyActuation < 1)
+          if (keyActuation.Actuation < 1)
           {
             if (parameters.AttackMgr.CurrentValue == 0)
             {
-              actuationDictionary[key] = 1;
+              keyActuation.Actuation = 1;
             }
             else
             {
-              actuationDictionary[key] = (float)Math.Min(keyActuation + 1.0 / parameters.AttackMgr.CurrentValue / sampleRate, 1.0);
+              keyActuation.Actuation = (float)Math.Min(keyActuation.Actuation + 1.0 / parameters.AttackMgr.CurrentValue / sampleRate, 1.0);
             }
           }
         }
 
-        foreach (var item in actuationDictionary)
+        foreach (var item in keyDataDict)
         {
+          var data = item.Value;
+          if (data.Detune != 1.0 || data.DetuneVec != 0.0)
+          {
+            var pull = (1.0f - data.Detune) * parameters.InTuAcMgr.CurrentValue * 10000f;
+            var scaledFriction = parameters.InTuFrMgr.CurrentValue / sampleRate * 100f;
+            data.DetuneVec = (data.DetuneVec + pull / sampleRate) * (1.0f - scaledFriction);
+            data.Detune += data.DetuneVec / sampleRate;
+            data.Time += data.Detune / sampleRate;
+          }
+
           if (keys.Contains(item.Key))
           {
             continue;
@@ -63,32 +74,30 @@ namespace Smx.Vst.Smx
           }
           else
           {
-            keyActuation = (float)Math.Max(item.Value - 1.0 / parameters.ReleaseMgr.CurrentValue / sampleRate, 0.0);
+            keyActuation = (float)Math.Max(item.Value.Actuation - 1.0 / parameters.ReleaseMgr.CurrentValue / sampleRate, 0.0);
           }
 
           if (keyActuation <= 0)
           {
-            actuationDictionary.Remove(item.Key);
+            keyDataDict.Remove(item.Key);
           }
           else
           {
-            actuationDictionary[item.Key] = keyActuation;
+            keyDataDict[item.Key].Actuation = keyActuation;
           }
         }
 
         var notes = GeneratorList.List.Where(g => parameters.GenMgrs[g.Index].CurrentValue == 1)
                                       .Select(o => o.Factor).ToList();
 
-        double time = (sampleIndex + i) / sampleRate;
         foreach (var channel in outChannels)
         {
-          channel[i] = (float)actuationDictionary.Sum(actuation =>
-            actuation.Value * ((parameters.FmModMgr.CurrentValue == 1) ? notes.Aggregate(1.0, (a, note) => a * 1.5 * Wave(parameters.SawMgr.CurrentValue, time * noteFrequencies[actuation.Key] * note)) :
-                                                       notes.Sum(note => Wave(parameters.SawMgr.CurrentValue, time * noteFrequencies[actuation.Key] * note))));
+          channel[i] = (float)keyDataDict.Sum(entry =>
+            entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1) ? notes.Aggregate(1.0, (a, note) => a * 1.5 * Wave(parameters.SawMgr.CurrentValue, entry.Value.Time * noteFrequencies[entry.Key] * note)) 
+                                                                             : notes.Sum(note => Wave(parameters.SawMgr.CurrentValue, entry.Value.Time * noteFrequencies[entry.Key] * note)))
+          );
         }
       }
-
-      sampleIndex += outChannels.FirstOrDefault()?.SampleCount ?? 0;
     }
 
     internal void ProcessNoteOffEvent(byte v)
@@ -129,6 +138,14 @@ namespace Smx.Vst.Smx
       double combined = (1 - saw) * sin_wave + saw * saw_wave;
 
       return Math.Pow(Math.Abs(combined), parameters.PowMgr.CurrentValue) * Math.Sign(combined);
+    }
+
+    class KeyData
+    {
+      public float Actuation { get; set; }
+      public float Detune { get; set; }
+      public float DetuneVec { get; set; }
+      public float Time { get; set; }
     }
   }
 }

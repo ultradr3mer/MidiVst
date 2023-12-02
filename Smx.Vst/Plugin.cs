@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
 using VstNetAudioPlugin;
+using MahApps.Metro.Controls;
 
 namespace Smx.Vst
 {
@@ -26,6 +27,7 @@ namespace Smx.Vst
 
     protected override void ConfigureServices(IServiceCollection services)
     {
+      var test = new MetroWindow();
       services.AddSingleton<PluginParameters>()
                 .AddSingletonAll<PluginPrograms>()
                 .AddSingleton<VstMidiProgram>()

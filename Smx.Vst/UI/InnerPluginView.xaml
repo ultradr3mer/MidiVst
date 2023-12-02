@@ -6,19 +6,22 @@
              xmlns:local="clr-namespace:Smx.Vst.UI"
              mc:Ignorable="d" 
              Height="450" Width="800">
-    <Grid>
+  <UserControl.Resources>
+    <ResourceDictionary Source="/Smx.Vst;component/UI/StyleDictionary.xaml"/>
+  </UserControl.Resources>
+  <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*"/>
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
-    <ListBox x:Name="listBox" ItemsSource="{Binding GeneratorKnobs}" d:ItemsSource="{d:SampleData ItemCount=5}" Background="Black" Foreground="White">
+    <ListBox x:Name="listBox" ItemsSource="{Binding GeneratorKnobs}" d:ItemsSource="{d:SampleData ItemCount=5}" >
       <ListBox.ItemTemplate>
         <DataTemplate>
-          <CheckBox Content="{Binding Label}" IsChecked="{Binding IsValue}" Foreground="White"/>
+          <CheckBox Content="{Binding Label}" IsChecked="{Binding IsValue}" />
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
-    <ListBox x:Name="listBox1" ItemsSource="{Binding GeneralKnobs}" Grid.Column="1" d:ItemsSource="{d:SampleData ItemCount=5}" Background="Black" Foreground="White">
+    <ListBox x:Name="listBox1" ItemsSource="{Binding GeneralKnobs}" Grid.Column="1" d:ItemsSource="{d:SampleData ItemCount=5}" >
       <ListBox.ItemTemplate>
         <DataTemplate >
           <local:ParameterKnob HorizontalAlignment="Stretch"/></DataTemplate>

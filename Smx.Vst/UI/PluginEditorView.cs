@@ -22,12 +22,13 @@ namespace VstNetAudioPlugin.UI
       this.viewModel = new PluginViewModel();
       var view = new InnerPluginView() { DataContext = viewModel };
       host.Child = view;
-            using(var g = this.CreateGraphics())
-            {
-                this.Height = (int)(350 * g.DpiX / 96);
-                this.Width = (int)(650 * g.DpiY / 96); 
-            }
-      
+
+      using (var g = this.CreateGraphics())
+      {
+        this.Height = (int)(350 * g.DpiX / 96);
+        this.Width = (int)(650 * g.DpiY / 96);
+      }
+
       this.Controls.Add(host);
     }
 

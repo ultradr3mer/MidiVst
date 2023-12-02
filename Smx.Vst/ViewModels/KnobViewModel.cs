@@ -29,8 +29,9 @@ namespace Smx.Vst.ViewModels
       this.CheckboxVisibility = item.ParameterInfo.IsSwitch ? Visibility.Visible : Visibility.Hidden;
       this.SliderVisibility = item.ParameterInfo.IsSwitch ? Visibility.Hidden : Visibility.Visible;
       item.PropertyChanged += Item_PropertyChanged;
-      this.PropertyChanged += KnobViewModel_PropertyChanged;
       this.Value = item.CurrentValue;
+      this.PropertyChanged += KnobViewModel_PropertyChanged;
+      this.PropertyChanged(this, new PropertyChangedEventArgs(nameof(this.Value)));
     }
 
     private void KnobViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -40,7 +41,7 @@ namespace Smx.Vst.ViewModels
         if(mgr.ActiveParameter != null) { 
           mgr.ActiveParameter.Value = (float)this.Value;
         }
-        this.ValueString = this.Value.ToString();
+        this.ValueString = this.Value.ToString("0.000");
       }
     }
 

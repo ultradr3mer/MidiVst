@@ -39,6 +39,9 @@ namespace Smx.Vst.Smx
     public VstParameterManager ReleaseMgr;
     public VstParameterManager PowMgr;
 
+    public VstParameterManager IniDetMgr { get; private set; }
+    public VstParameterManager InTuAcMgr { get; private set; }
+    public VstParameterManager InTuFrMgr { get; private set; }
     public VstParameterManager SawMgr { get; private set; }
     public VstParameterManager[] GenMgrs { get; private set; }
 
@@ -52,7 +55,7 @@ namespace Smx.Vst.Smx
       VstParameterCategory paramCategory =
           parameters.GetParameterCategory(ParameterCategoryName);
 
-      VstParameterManager CreateFloat(string name, string label, string shortLabel)
+      VstParameterManager CreateFloat(string name, string label, string shortLabel, float defaultValue = 0)
       {
         var paramInfo = new VstParameterInfo
         {
@@ -64,7 +67,7 @@ namespace Smx.Vst.Smx
           LargeStepFloat = 0.1f,
           SmallStepFloat = 0.01f,
           StepFloat = 0.05f,
-          DefaultValue = 0.0f
+          DefaultValue = defaultValue,
         };
 
         parameterInfos.Add(paramInfo);
@@ -84,6 +87,7 @@ namespace Smx.Vst.Smx
           Label = label,
           ShortLabel = shortLabel,
           IsSwitch = true,
+          DefaultValue = 0
         };
 
         parameterInfos.Add(paramInfo);
@@ -107,10 +111,23 @@ namespace Smx.Vst.Smx
                            shortLabel: "Release");
       PowMgr = CreateFloat(name: PowParameterName,
                            label: "Power to raise by",
-                           shortLabel: "Power");
+                           shortLabel: "Power",
+                           defaultValue: 1.0f);
+
+      IniDetMgr = CreateFloat(name: "IniDet",
+                  label: "Initial Detune",
+                  shortLabel: "Ini.Det.");
+      InTuAcMgr = CreateFloat(name: "InTuAc",
+                  label: "Initial Detune Acceleration",
+                  shortLabel: "I.De.Ac.");
+      InTuFrMgr = CreateFloat(name: "InTuFr",
+                  label: "Initial Detune Friction",
+                  shortLabel: "I.De.Fr.",
+                  defaultValue: 0.5f);
 
       GenMgrs = new VstParameterManager[GeneratorList.List.Count];
-      foreach (var gen in GeneratorList.List) {
+      foreach (var gen in GeneratorList.List)
+      {
 
         GenMgrs[gen.Index] = CreateSwitch(name: gen.ParameterName,
                              label: gen.ParameterLabel,
