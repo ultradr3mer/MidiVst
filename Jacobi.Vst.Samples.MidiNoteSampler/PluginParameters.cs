@@ -1,7 +1,7 @@
 ﻿using Jacobi.Vst.Plugin.Framework;
 using Jacobi.Vst.Plugin.Framework.Plugin;
+using Jacobi.Vst.Samples.MidiNoteSampler.Smx;
 using System.Linq;
-using VstNetAudioPlugin.Dsp;
 
 namespace VstNetAudioPlugin
 {
@@ -16,7 +16,7 @@ namespace VstNetAudioPlugin
         public PluginParameters(IVstPluginEvents pluginEvents)
         {
             // register the parameters of all plugin (sub) components
-            DelayParameters = new DelayParameters(this);
+            SmxParameters = new SmxParameters(this);
 
             pluginEvents.Opened += Plugin_Opened;
         }
@@ -27,7 +27,7 @@ namespace VstNetAudioPlugin
             SetHostAutomation(plugin?.Host?.GetInstance<IVstHostAutomation>());
         }
 
-        public DelayParameters DelayParameters { get; private set; }
+        public SmxParameters SmxParameters { get; private set; }
 
         /// <summary>
         /// Gets the central list of parameter categories.

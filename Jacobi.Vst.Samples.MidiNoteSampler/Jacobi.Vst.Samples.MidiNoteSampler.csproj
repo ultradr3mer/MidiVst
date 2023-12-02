@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
     <PackageReference Include="VST.NET2-Plugin" Version="2.1.0" />
   </ItemGroup>
 </Project>

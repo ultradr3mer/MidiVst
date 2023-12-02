@@ -1,24 +1,25 @@
 ﻿namespace Jacobi.Vst.Samples.MidiNoteSampler
 {
-  using Jacobi.Vst.Core;
-  using Jacobi.Vst.Plugin.Framework;
-  using Jacobi.Vst.Samples.MidiNoteSampler.Enums;
-  using System;
-  using System.Collections.Concurrent;
-  using System.Linq;
+    using Jacobi.Vst.Core;
+    using Jacobi.Vst.Plugin.Framework;
+    using Jacobi.Vst.Samples.MidiNoteSampler.Enums;
+    using Jacobi.Vst.Samples.MidiNoteSampler.Smx;
+    using System;
+    using System.Collections.Concurrent;
+    using System.Linq;
 
-  /// <summary>
-  /// Manages incoming midi events and sents them to the <see cref="SampleManager"/>.
-  /// </summary>
-  internal sealed class MidiProcessor : IVstMidiProcessor
+    /// <summary>
+    /// Manages incoming midi events and sents them to the <see cref="SampleManager"/>.
+    /// </summary>
+    internal sealed class MidiProcessor : IVstMidiProcessor
   {
-    private readonly Generator generator;
+    private readonly Smx.Smx generator;
 
     /// <summary>
     /// Constructs a new instance.
     /// </summary>
     /// <param name="plugin"></param>
-    public MidiProcessor(Generator generator)
+    public MidiProcessor(Smx.Smx generator)
     {
       this.generator = generator ?? throw new ArgumentNullException(nameof(generator));
     }

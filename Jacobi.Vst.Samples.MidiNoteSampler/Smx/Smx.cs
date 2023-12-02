@@ -1,6 +1,7 @@
 ﻿using Jacobi.Vst.Core;
 using Jacobi.Vst.Plugin.Framework;
 using Jacobi.Vst.Plugin.Framework.Plugin;
+using Jacobi.Vst.Samples.MidiNoteSampler.Data;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,28 +10,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using VstNetAudioPlugin.Dsp;
+using VstNetAudioPlugin;
 
-namespace Jacobi.Vst.Samples.MidiNoteSampler
+namespace Jacobi.Vst.Samples.MidiNoteSampler.Smx
 {
-  internal class Generator
+  internal class Smx
   {
     private const double Pi2 = Math.PI * 2.0;
     private const double a4Index = 69;
     private const double a4Frequency = 440.0;
-    private static readonly double multiplyer = (double)Math.Pow(2, 1.0 / 12.0);
+    private static readonly double multiplyer = Math.Pow(2, 1.0 / 12.0);
     private static readonly Dictionary<int, float> noteFrequencies = Enumerable.Range(0, 127).ToDictionary(x => x, x => (float)(a4Frequency * Math.Pow(multiplyer, x - 69)));
-
+    private readonly SmxParameters parameters;
     public long sampleIndex = 0;
 
     private HashSet<byte> keys = new HashSet<byte>();
     private Dictionary<byte, float> actuationDictionary = new Dictionary<byte, float>();
 
-    public bool IsPlaying => keys.Any() || this.actuationDictionary.Any();
+    public bool IsPlaying => keys.Any() || actuationDictionary.Any();
+
+    public Smx(PluginParameters parameters)
+    {
+      this.parameters = parameters.SmxParameters;
+    }
 
     internal void Generate(float sampleRate, VstAudioBuffer[] outChannels)
     {
-
       int length = outChannels[0].SampleCount;
       for (int i = 0; i < length; i++)
       {
@@ -43,13 +48,13 @@ namespace Jacobi.Vst.Samples.MidiNoteSampler
 
           if (keyActuation < 1)
           {
-            if (DelayParameters.Attack == 0)
+            if (parameters.AttackMgr.CurrentValue == 0)
             {
               actuationDictionary[key] = 1;
             }
             else
             {
-              actuationDictionary[key] = (float)Math.Min(keyActuation + 1.0 / DelayParameters.Attack / sampleRate, 1.0);
+              actuationDictionary[key] = (float)Math.Min(keyActuation + 1.0 / parameters.AttackMgr.CurrentValue / sampleRate, 1.0);
             }
           }
         }
@@ -62,13 +67,13 @@ namespace Jacobi.Vst.Samples.MidiNoteSampler
           }
 
           float keyActuation;
-          if (DelayParameters.Release == 0)
+          if (parameters.ReleaseMgr.CurrentValue == 0)
           {
             keyActuation = 0;
           }
           else
           {
-            keyActuation = (float)Math.Max(item.Value - 1.0 / DelayParameters.Release / sampleRate, 0.0);
+            keyActuation = (float)Math.Max(item.Value - 1.0 / parameters.ReleaseMgr.CurrentValue / sampleRate, 0.0);
           }
 
           if (keyActuation <= 0)
@@ -81,19 +86,22 @@ namespace Jacobi.Vst.Samples.MidiNoteSampler
           }
         }
 
+        var notes = GeneratorList.List.Where(g => parameters.GenMgrs[g.Index].CurrentValue == 1)
+                                      .Select(o => o.Factor).ToList();
+
         double time = (sampleIndex + i) / sampleRate;
         foreach (var channel in outChannels)
         {
-          channel[i] = (float)this.actuationDictionary.Sum(actuation => 
-            actuation.Value * (DelayParameters.FmMod ? DelayParameters.Notes.Aggregate<int, double>(1.0, (a, o) => a * 1.5 * Wave(DelayParameters.Saw, time * noteFrequencies[actuation.Key] * o / 12.0)) :
-                                                       DelayParameters.Notes.Sum(o => Wave(DelayParameters.Saw, time * noteFrequencies[actuation.Key] * o / 12.0))));
+          channel[i] = (float)actuationDictionary.Sum(actuation =>
+            actuation.Value * ((parameters.FmModMgr.CurrentValue == 1) ? notes.Aggregate(1.0, (a, note) => a * 1.5 * Wave(parameters.SawMgr.CurrentValue, time * noteFrequencies[actuation.Key] * note)) :
+                                                       notes.Sum(note => Wave(parameters.SawMgr.CurrentValue, time * noteFrequencies[actuation.Key] * note))));
         }
       }
 
       sampleIndex += outChannels.FirstOrDefault()?.SampleCount ?? 0;
     }
 
-    static double Wave(double saw, double t)
+    double Wave(double saw, double t)
     {
       t = t % 1;
       double segment13_length = (1.0 - saw) / 4.0;
@@ -103,9 +111,9 @@ namespace Jacobi.Vst.Samples.MidiNoteSampler
       {
         t = t / (1 - saw);
       }
-      else if (t < (segment13_length + segment2_length))
+      else if (t < segment13_length + segment2_length)
       {
-        t = (t - segment13_length) / (1.0 + saw) + (1.0 / 4.0);
+        t = (t - segment13_length) / (1.0 + saw) + 1.0 / 4.0;
       }
       else
       {
@@ -114,13 +122,13 @@ namespace Jacobi.Vst.Samples.MidiNoteSampler
 
       double sin_wave = Math.Sin(2 * Math.PI * t);
 
-      double saw_wave = t < (1.0 / 4.0) ? t * 4.0 :
-        t < (3.0 / 4.0) ? 1 - (t - (1.0 / 4.0)) * 4.0 :
-        (-4.0 + (4.0 * t));
+      double saw_wave = t < 1.0 / 4.0 ? t * 4.0 :
+        t < 3.0 / 4.0 ? 1 - (t - 1.0 / 4.0) * 4.0 :
+        -4.0 + 4.0 * t;
 
       double combined = (1 - saw) * sin_wave + saw * saw_wave;
 
-      return Math.Pow(Math.Abs(combined),0.5)*Math.Sign(combined);
+      return Math.Pow(Math.Abs(combined), parameters.PowMgr.CurrentValue) * Math.Sign(combined);
     }
 
     internal void ProcessNoteOffEvent(byte v)
