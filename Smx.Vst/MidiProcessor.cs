@@ -1,25 +1,23 @@
-﻿namespace Jacobi.Vst.Samples.MidiNoteSampler
+﻿namespace Smx.Vst
 {
-    using Jacobi.Vst.Core;
-    using Jacobi.Vst.Plugin.Framework;
-    using Jacobi.Vst.Samples.MidiNoteSampler.Enums;
-    using Jacobi.Vst.Samples.MidiNoteSampler.Smx;
-    using System;
-    using System.Collections.Concurrent;
-    using System.Linq;
+  using global::Smx.Vst.Enums;
+  using Jacobi.Vst.Core;
+  using Jacobi.Vst.Plugin.Framework;
+  using System;
+  using System.Collections.Concurrent;
 
-    /// <summary>
-    /// Manages incoming midi events and sents them to the <see cref="SampleManager"/>.
-    /// </summary>
-    internal sealed class MidiProcessor : IVstMidiProcessor
+  /// <summary>
+  /// Manages incoming midi events and sents them to the <see cref="SampleManager"/>.
+  /// </summary>
+  internal sealed class MidiProcessor : IVstMidiProcessor
   {
-    private readonly Smx.Smx generator;
+    private readonly Smx.SmxGenerator generator;
 
     /// <summary>
     /// Constructs a new instance.
     /// </summary>
     /// <param name="plugin"></param>
-    public MidiProcessor(Smx.Smx generator)
+    public MidiProcessor(Smx.SmxGenerator generator)
     {
       this.generator = generator ?? throw new ArgumentNullException(nameof(generator));
     }
@@ -40,8 +38,8 @@
     /// <param name="events">The midi events for the current cycle.</param>
     public void Process(VstEventCollection events)
     {
-      var keyOffQueue = new ConcurrentQueue<byte>();  
-      var keyOnQueue = new ConcurrentQueue<byte>();  
+      var keyOffQueue = new ConcurrentQueue<byte>();
+      var keyOnQueue = new ConcurrentQueue<byte>();
 
       foreach (VstEvent evnt in events)
       {
@@ -81,6 +79,6 @@
       }
     }
 
-    #endregion
+    #endregion IVstMidiProcessor Members
   }
 }

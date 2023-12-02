@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
 
-namespace Jacobi.Vst.Samples.MidiNoteSampler.Enums
+namespace Smx.Vst.Enums
 {
   internal enum MidiChannelVoiceMessages
   {

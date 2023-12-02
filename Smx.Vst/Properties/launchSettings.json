@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Jacobi.Vst.Samples.MidiNoteSampler": {
+    "Smx.Vst": {
       "commandName": "Project"
     },
     "Launch FL": {

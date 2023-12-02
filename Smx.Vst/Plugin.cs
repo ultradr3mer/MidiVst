@@ -1,13 +1,13 @@
 ﻿using Jacobi.Vst.Core;
 using Jacobi.Vst.Plugin.Framework;
 using Jacobi.Vst.Plugin.Framework.Plugin;
-using Jacobi.Vst.Samples.MidiNoteSampler.Smx;
+using Smx.Vst.Smx;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
 using VstNetAudioPlugin;
 
-namespace Jacobi.Vst.Samples.MidiNoteSampler
+namespace Smx.Vst
 {
     /// <summary>
     /// The Plugin root class that derives from the framework provided base class that also include the interface manager.
@@ -29,7 +29,7 @@ namespace Jacobi.Vst.Samples.MidiNoteSampler
       services.AddSingleton<PluginParameters>()
                 .AddSingletonAll<PluginPrograms>()
                 .AddSingleton<VstMidiProgram>()
-                .AddSingleton<Smx.Smx>()
+                .AddSingleton<Smx.SmxGenerator>()
                 .AddSingletonAll<AudioProcessor>()
                 .AddSingletonAll<MidiProcessor>()
                 .AddSingletonAll<PluginEditor>();

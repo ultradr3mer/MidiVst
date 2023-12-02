@@ -1,9 +1,9 @@
-﻿<UserControl x:Class="Jacobi.Vst.Samples.MidiNoteSampler.UI.ParameterKnob"
+﻿<UserControl x:Class="Smx.Vst.UI.ParameterKnob"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Jacobi.Vst.Samples.MidiNoteSampler.UI"
+             xmlns:local="clr-namespace:Smx.Vst.UI"
              mc:Ignorable="d" 
              Height="40" Width="300">
     <Grid >

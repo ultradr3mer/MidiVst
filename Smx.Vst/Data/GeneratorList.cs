@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Jacobi.Vst.Samples.MidiNoteSampler.Data
+namespace Smx.Vst.Data
 {
   public class GeneratorList
   {

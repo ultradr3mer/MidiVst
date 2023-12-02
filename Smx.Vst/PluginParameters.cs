@@ -1,6 +1,6 @@
 ﻿using Jacobi.Vst.Plugin.Framework;
 using Jacobi.Vst.Plugin.Framework.Plugin;
-using Jacobi.Vst.Samples.MidiNoteSampler.Smx;
+using Smx.Vst.Smx;
 using System.Linq;
 
 namespace VstNetAudioPlugin

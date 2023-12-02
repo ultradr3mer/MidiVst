@@ -1,5 +1,5 @@
 ﻿using Jacobi.Vst.Plugin.Framework;
-using Jacobi.Vst.Samples.MidiNoteSampler.Data;
+using Smx.Vst.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jacobi.Vst.Samples.MidiNoteSampler.ViewModels
+namespace Smx.Vst.ViewModels
 {
   internal class PluginViewModel
   {

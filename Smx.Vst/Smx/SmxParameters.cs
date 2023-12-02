@@ -1,13 +1,13 @@
 ﻿using Jacobi.Vst.Core;
 using Jacobi.Vst.Plugin.Framework;
-using Jacobi.Vst.Samples.MidiNoteSampler.Data;
+using Smx.Vst.Data;
 using System.Collections.Generic;
 using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using VstNetAudioPlugin;
 
-namespace Jacobi.Vst.Samples.MidiNoteSampler.Smx
+namespace Smx.Vst.Smx
 {
   /// <summary>
   /// Encapsulated delay parameters.
@@ -116,63 +116,6 @@ namespace Jacobi.Vst.Samples.MidiNoteSampler.Smx
                              label: gen.ParameterLabel,
                              shortLabel: gen.DisplayName);
       }
-
-      //// feedback parameter
-      //paramInfo = new VstParameterInfo
-      //{
-      //  Category = paramCategory,
-      //  CanBeAutomated = true,
-      //  Name = "Feedbck",
-      //  Label = "Factor",
-      //  ShortLabel = "*",
-      //  LargeStepFloat = 0.1f,
-      //  SmallStepFloat = 0.01f,
-      //  StepFloat = 0.05f,
-      //  DefaultValue = 0.4f
-      //};
-      //FeedbackMgr = paramInfo
-      //    .Normalize()
-      //    .ToManager();
-
-      //parameterInfos.Add(paramInfo);
-
-      //// dry Level parameter
-      //paramInfo = new VstParameterInfo
-      //{
-      //  Category = paramCategory,
-      //  CanBeAutomated = true,
-      //  Name = "Dry Lvl",
-      //  Label = "Decibel",
-      //  ShortLabel = "Db",
-      //  LargeStepFloat = 0.1f,
-      //  SmallStepFloat = 0.01f,
-      //  StepFloat = 0.05f,
-      //  DefaultValue = 0.8f
-      //};
-      //DryLevelMgr = paramInfo
-      //    .Normalize()
-      //    .ToManager();
-
-      //parameterInfos.Add(paramInfo);
-
-      //// wet Level parameter
-      //paramInfo = new VstParameterInfo
-      //{
-      //  Category = paramCategory,
-      //  CanBeAutomated = true,
-      //  Name = "Wet Lvl",
-      //  Label = "Decibel",
-      //  ShortLabel = "Db",
-      //  LargeStepFloat = 0.1f,
-      //  SmallStepFloat = 0.01f,
-      //  StepFloat = 0.05f,
-      //  DefaultValue = 0.4f
-      //};
-      //WetLevelMgr = paramInfo
-      //    .Normalize()
-      //    .ToManager();
-
-      //parameterInfos.Add(paramInfo);
     }
   }
 }

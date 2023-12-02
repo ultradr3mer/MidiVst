@@ -3,7 +3,7 @@ using Jacobi.Vst.Plugin.Framework.Plugin;
 using System;
 using VstNetAudioPlugin;
 
-namespace Jacobi.Vst.Samples.MidiNoteSampler
+namespace Smx.Vst
 {
   /// <summary>
   /// This object manages the Plugin programs and its parameters.

@@ -1,38 +1,28 @@
 ﻿using Jacobi.Vst.Core;
-using Jacobi.Vst.Plugin.Framework;
-using Jacobi.Vst.Plugin.Framework.Plugin;
-using Jacobi.Vst.Samples.MidiNoteSampler.Data;
+using Smx.Vst.Data;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using VstNetAudioPlugin;
 
-namespace Jacobi.Vst.Samples.MidiNoteSampler.Smx
+namespace Smx.Vst.Smx
 {
-  internal class Smx
+  internal class SmxGenerator
   {
-    private const double Pi2 = Math.PI * 2.0;
-    private const double a4Index = 69;
+    public long sampleIndex = 0;
     private const double a4Frequency = 440.0;
     private static readonly double multiplyer = Math.Pow(2, 1.0 / 12.0);
     private static readonly Dictionary<int, float> noteFrequencies = Enumerable.Range(0, 127).ToDictionary(x => x, x => (float)(a4Frequency * Math.Pow(multiplyer, x - 69)));
     private readonly SmxParameters parameters;
-    public long sampleIndex = 0;
-
-    private HashSet<byte> keys = new HashSet<byte>();
     private Dictionary<byte, float> actuationDictionary = new Dictionary<byte, float>();
+    private HashSet<byte> keys = new HashSet<byte>();
 
-    public bool IsPlaying => keys.Any() || actuationDictionary.Any();
-
-    public Smx(PluginParameters parameters)
+    public SmxGenerator(PluginParameters parameters)
     {
       this.parameters = parameters.SmxParameters;
     }
+
+    public bool IsPlaying => keys.Any() || actuationDictionary.Any();
 
     internal void Generate(float sampleRate, VstAudioBuffer[] outChannels)
     {
@@ -101,7 +91,17 @@ namespace Jacobi.Vst.Samples.MidiNoteSampler.Smx
       sampleIndex += outChannels.FirstOrDefault()?.SampleCount ?? 0;
     }
 
-    double Wave(double saw, double t)
+    internal void ProcessNoteOffEvent(byte v)
+    {
+      keys.Remove(v);
+    }
+
+    internal void ProcessNoteOnEvent(byte v)
+    {
+      keys.Add(v);
+    }
+
+    private double Wave(double saw, double t)
     {
       t = t % 1;
       double segment13_length = (1.0 - saw) / 4.0;
@@ -129,16 +129,6 @@ namespace Jacobi.Vst.Samples.MidiNoteSampler.Smx
       double combined = (1 - saw) * sin_wave + saw * saw_wave;
 
       return Math.Pow(Math.Abs(combined), parameters.PowMgr.CurrentValue) * Math.Sign(combined);
-    }
-
-    internal void ProcessNoteOffEvent(byte v)
-    {
-      keys.Remove(v);
-    }
-
-    internal void ProcessNoteOnEvent(byte v)
-    {
-      keys.Add(v);
     }
   }
 }

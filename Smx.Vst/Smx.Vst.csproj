@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net6.0-windows</TargetFramework>
     <Version>2.1.0</Version>
-    <Authors>Marc Jacobi</Authors>
-    <Company>Jacobi Software</Company>
-    <Product>VST.NET Samples</Product>
+    <Authors>Clara Schulz-Theißen</Authors>
+    <Company>Clara Schulz-Theißen</Company>
+    <Product>SMX</Product>
     <Platforms>x64;x86</Platforms>
-    <Description>A VSTi (instrument) Plugin that implements a sampler.</Description>
+    <Description>SMX Vst</Description>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>

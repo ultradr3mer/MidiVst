@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Jacobi.Vst.Samples.MidiNoteSampler.ViewModels
+namespace Smx.Vst.ViewModels
 {
   internal class KnobViewModel : INotifyPropertyChanged
   {

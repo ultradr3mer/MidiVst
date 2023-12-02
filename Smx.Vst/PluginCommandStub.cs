@@ -1,7 +1,7 @@
 ﻿using Jacobi.Vst.Plugin.Framework;
 using Jacobi.Vst.Plugin.Framework.Plugin;
 
-namespace Jacobi.Vst.Samples.MidiNoteSampler
+namespace Smx.Vst
 {
     /// <summary>
     /// The public Plugin Command Stub implementation derived from the framework provided <see cref="StdPluginCommandStub"/>.

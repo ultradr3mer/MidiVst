@@ -1,22 +1,21 @@
-﻿namespace Jacobi.Vst.Samples.MidiNoteSampler
+﻿namespace Smx.Vst
 {
     using Jacobi.Vst.Core;
     using Jacobi.Vst.Plugin.Framework.Plugin;
-    using Jacobi.Vst.Samples.MidiNoteSampler.Smx;
     using System;
 
     /// <summary>
-    /// Implements the audio processing of the plugin using the <see cref="Smx.Smx"/>.
+    /// Implements the audio processing of the plugin using the <see cref="Smx.SmxGenerator"/>.
     /// </summary>
     internal sealed class AudioProcessor : VstPluginAudioProcessor
   {
-    private readonly Smx.Smx generator;
+    private readonly Smx.SmxGenerator generator;
 
     /// <summary>
     /// Constructs a new instance.
     /// </summary>
     /// <param name="plugin">Must not be null.</param>
-    public AudioProcessor(Smx.Smx generator)
+    public AudioProcessor(Smx.SmxGenerator generator)
         : base(2, 2, 0, noSoundInStop: true)
     {
       this.generator = generator ?? throw new ArgumentNullException(nameof(generator));
