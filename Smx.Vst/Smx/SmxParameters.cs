@@ -44,6 +44,7 @@ namespace Smx.Vst.Smx
     public VstParameterManager InTuFrMgr { get; private set; }
     public VstParameterManager SawMgr { get; private set; }
     public VstParameterManager[] GenMgrs { get; private set; }
+    public VstParameterManager[] GenPhaseMgrs { get; private set; }
 
     // This method initializes the plugin parameters this Dsp component owns.
     private void InitializeParameters(PluginParameters parameters)
@@ -126,12 +127,16 @@ namespace Smx.Vst.Smx
                   defaultValue: 0.5f);
 
       GenMgrs = new VstParameterManager[GeneratorList.List.Count];
+      GenPhaseMgrs = new VstParameterManager[GeneratorList.List.Count];
       foreach (var gen in GeneratorList.List)
       {
 
         GenMgrs[gen.Index] = CreateSwitch(name: gen.ParameterName,
                              label: gen.ParameterLabel,
                              shortLabel: gen.DisplayName);
+        GenPhaseMgrs[gen.Index] = CreateFloat(name: gen.PhaseParameterName,
+                     label: gen.PhaseParameterLabel,
+                     shortLabel: gen.DisplayName);
       }
     }
   }

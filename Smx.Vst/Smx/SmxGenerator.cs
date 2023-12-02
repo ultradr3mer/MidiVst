@@ -14,6 +14,7 @@ namespace Smx.Vst.Smx
     private static readonly double multiplyer = Math.Pow(2, 1.0 / 12.0);
     private static readonly Dictionary<int, float> noteFrequencies = Enumerable.Range(0, 127).ToDictionary(x => x, x => (float)(a4Frequency * Math.Pow(multiplyer, x - 69)));
     private readonly SmxParameters parameters;
+    private readonly double PiBy2 = Math.PI * 2.0;
     private Dictionary<byte, KeyData> keyDataDict = new Dictionary<byte, KeyData>();
     private HashSet<byte> keys = new HashSet<byte>();
 
@@ -91,14 +92,14 @@ namespace Smx.Vst.Smx
           }
         }
 
-        var notes = GeneratorList.List.Where(g => parameters.GenMgrs[g.Index].CurrentValue == 1)
-                                      .Select(o => o.Factor).ToList();
+        var shifts = GeneratorList.List.Where(g => parameters.GenMgrs[g.Index].CurrentValue == 1)
+                                      .Select(o => o.Index).ToList();
 
         foreach (var channel in outChannels)
         {
           channel[i] = (float)keyDataDict.Sum(entry =>
-            entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1) ? notes.Aggregate(1.0, (a, note) => a * 1.5 * Wave(parameters.SawMgr.CurrentValue, entry.Value.Time * noteFrequencies[entry.Key] * note)) 
-                                                                             : notes.Sum(note => Wave(parameters.SawMgr.CurrentValue, entry.Value.Time * noteFrequencies[entry.Key] * note)))
+            entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1) ? shifts.Aggregate(1.0, (a, s) => a * 1.5 * Wave(parameters.SawMgr.CurrentValue, entry.Value.Time * noteFrequencies[entry.Key] * GeneratorList.Dict[s].Factor + parameters.GenPhaseMgrs[s].CurrentValue)) 
+                                                                             : shifts.Sum(s => Wave(parameters.SawMgr.CurrentValue, entry.Value.Time * noteFrequencies[entry.Key] * GeneratorList.Dict[s].Factor + parameters.GenPhaseMgrs[s].CurrentValue)))
           );
         }
       }
