@@ -61,6 +61,10 @@ namespace Smx.Vst.Smx
             data.Detune += data.DetuneVec / sampleRate;
             data.Time += data.Detune / sampleRate;
           }
+          else
+          {
+            data.Time += 1.0f / sampleRate;
+          }
 
           if (keys.Contains(item.Key))
           {
