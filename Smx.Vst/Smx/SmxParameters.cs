@@ -40,8 +40,12 @@ namespace Smx.Vst.Smx
     public VstParameterManager PowMgr;
 
     public VstParameterManager IniDetMgr { get; private set; }
+    public VstParameterManager MembraneAcMgr { get; private set; }
+    public VstParameterManager MembraneFrMgr { get; private set; }
+    public VstParameterManager MembraneClipMgr { get; private set; }
     public VstParameterManager InTuAcMgr { get; private set; }
     public VstParameterManager InTuFrMgr { get; private set; }
+    public VstParameterManager MembraneMixMgr { get; private set; }
     public VstParameterManager SawMgr { get; private set; }
     public VstParameterManager[] GenMgrs { get; private set; }
     public VstParameterManager[] GenPhaseMgrs { get; private set; }
@@ -117,14 +121,29 @@ namespace Smx.Vst.Smx
 
       IniDetMgr = CreateFloat(name: "IniDet",
                   label: "Initial Detune",
-                  shortLabel: "Ini.Det.");
+                  shortLabel: "Ini.Det.",
+                  defaultValue: 0.5f);
       InTuAcMgr = CreateFloat(name: "InTuAc",
                   label: "Initial Detune Acceleration",
                   shortLabel: "I.De.Ac.");
       InTuFrMgr = CreateFloat(name: "InTuFr",
                   label: "Initial Detune Friction",
-                  shortLabel: "I.De.Fr.",
+                  shortLabel: "I.De.Fr.");
+
+      MembraneMixMgr = CreateFloat(name: "MemMix",
+            label: "Membrane Wet/Dry",
+            shortLabel: "Mem.Mix");
+      MembraneAcMgr = CreateFloat(name: "MemAc",
+                  label: "Membrane Acceleration",
+                  shortLabel: "Mem.Ac.");
+      MembraneFrMgr = CreateFloat(name: "MemFr",
+                  label: "Membrane Friction",
+                  shortLabel: "Mem.Fr.",
                   defaultValue: 0.5f);
+      MembraneClipMgr = CreateFloat(name: "MemClp",
+            label: "Membrane Clip",
+            shortLabel: "Mem.Cl.",
+            defaultValue: 1.0f);
 
       GenMgrs = new VstParameterManager[GeneratorList.List.Count];
       GenPhaseMgrs = new VstParameterManager[GeneratorList.List.Count];

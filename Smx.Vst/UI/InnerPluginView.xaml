@@ -16,15 +16,16 @@
     </Grid.ColumnDefinitions>
     <ListBox x:Name="listBox" ItemsSource="{Binding GeneratorKnobs}" d:ItemsSource="{d:SampleData ItemCount=5}" >
       <ListBox.ItemTemplate>
-        <DataTemplate>
-          <CheckBox Content="{Binding Label}" IsChecked="{Binding IsValue}" />
+        <DataTemplate >
+          <local:GeneratorView HorizontalAlignment="Left"/>
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
     <ListBox x:Name="listBox1" ItemsSource="{Binding GeneralKnobs}" Grid.Column="1" d:ItemsSource="{d:SampleData ItemCount=5}" >
       <ListBox.ItemTemplate>
         <DataTemplate >
-          <local:ParameterKnob HorizontalAlignment="Stretch"/></DataTemplate>
+          <local:ParameterKnob HorizontalAlignment="Stretch"/>
+        </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
 

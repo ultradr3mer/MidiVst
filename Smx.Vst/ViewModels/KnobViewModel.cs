@@ -15,8 +15,7 @@ namespace Smx.Vst.ViewModels
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public string Label { get; private set; }
-    public string ValueString { get; private set; }
+    public string Label { get; protected set; }
     public double Value { get; set; }
     public Visibility CheckboxVisibility { get; }
     public Visibility SliderVisibility { get; }
@@ -41,7 +40,6 @@ namespace Smx.Vst.ViewModels
         if(mgr.ActiveParameter != null) { 
           mgr.ActiveParameter.Value = (float)this.Value;
         }
-        this.ValueString = this.Value.ToString("0.000");
       }
     }
 

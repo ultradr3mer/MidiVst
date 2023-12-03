@@ -3,6 +3,7 @@ using Smx.Vst.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Markup;
 using VstNetAudioPlugin;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
@@ -17,6 +18,8 @@ namespace Smx.Vst.Smx
     private readonly double PiBy2 = Math.PI * 2.0;
     private Dictionary<byte, KeyData> keyDataDict = new Dictionary<byte, KeyData>();
     private HashSet<byte> keys = new HashSet<byte>();
+
+    private Dictionary<short, MembraneData> ChannelMembrane = new Dictionary<short, MembraneData>();
 
     public SmxGenerator(PluginParameters parameters)
     {
@@ -34,7 +37,7 @@ namespace Smx.Vst.Smx
         {
           if (!keyDataDict.TryGetValue(key, out KeyData keyActuation))
           {
-            keyActuation = new KeyData() { Actuation = 0, Detune = (float)Math.Pow(parameters.IniDetMgr.CurrentValue * 2.0f,2.0) };
+            keyActuation = new KeyData() { Actuation = 0, Detune = (float)Math.Pow(parameters.IniDetMgr.CurrentValue * 2.0f, 2.0) };
             keyDataDict[key] = keyActuation;
           }
 
@@ -56,8 +59,8 @@ namespace Smx.Vst.Smx
           var data = item.Value;
           if (data.Detune != 1.0 || data.DetuneVec != 0.0)
           {
-            var pull = (1.0f - data.Detune) * parameters.InTuAcMgr.CurrentValue * 10000f;
-            var scaledFriction = parameters.InTuFrMgr.CurrentValue / sampleRate * 100f;
+            var pull = (1.0f - data.Detune) * parameters.InTuAcMgr.CurrentValue * 100000f;
+            var scaledFriction = parameters.InTuFrMgr.CurrentValue / sampleRate * 1000f;
             data.DetuneVec = (data.DetuneVec + pull / sampleRate) * (1.0f - scaledFriction);
             data.Detune += data.DetuneVec / sampleRate;
             data.Time += data.Detune / sampleRate;
@@ -95,12 +98,51 @@ namespace Smx.Vst.Smx
         var shifts = GeneratorList.List.Where(g => parameters.GenMgrs[g.Index].CurrentValue == 1)
                                       .Select(o => o.Index).ToList();
 
+        short channelnNr = 0;
         foreach (var channel in outChannels)
         {
-          channel[i] = (float)keyDataDict.Sum(entry =>
-            entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1) ? shifts.Aggregate(1.0, (a, s) => a * 1.5 * Wave(parameters.SawMgr.CurrentValue, entry.Value.Time * noteFrequencies[entry.Key] * GeneratorList.Dict[s].Factor + parameters.GenPhaseMgrs[s].CurrentValue)) 
+          var newValue = (float)keyDataDict.Sum(entry =>
+            entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1) ? shifts.Aggregate(1.0, (a, s) => a * 1.5 * Wave(parameters.SawMgr.CurrentValue, entry.Value.Time * noteFrequencies[entry.Key] * GeneratorList.Dict[s].Factor + parameters.GenPhaseMgrs[s].CurrentValue))
                                                                              : shifts.Sum(s => Wave(parameters.SawMgr.CurrentValue, entry.Value.Time * noteFrequencies[entry.Key] * GeneratorList.Dict[s].Factor + parameters.GenPhaseMgrs[s].CurrentValue)))
           );
+
+          if (parameters.MembraneMixMgr.CurrentValue > 0)
+          {
+            if (!ChannelMembrane.TryGetValue(channelnNr, out var singleMembraneData))
+            {
+              singleMembraneData = new MembraneData();
+              ChannelMembrane[channelnNr] = singleMembraneData;
+            }
+
+            var pull = (newValue - singleMembraneData.Position) * (float)Math.Exp(parameters.MembraneAcMgr.CurrentValue * 20f) / sampleRate;
+            pull = (float)Math.Pow(Math.Abs(pull), 2.0) * (float)Math.Sign(pull);
+            singleMembraneData.Vector += pull;
+            var vecAbs = Math.Abs(singleMembraneData.Vector);
+            var breaking = -Math.Min((float)Math.Pow(Math.Abs(singleMembraneData.Vector)
+              * parameters.MembraneFrMgr.CurrentValue, 2.0) * 1f / sampleRate, Math.Abs(singleMembraneData.Vector)) 
+              * (float)Math.Sign(singleMembraneData.Vector);
+            singleMembraneData.Vector += breaking;
+            singleMembraneData.Position += singleMembraneData.Vector / sampleRate;
+
+            var posAbs = Math.Abs(singleMembraneData.Position);
+
+            //if (posAbs > parameters.MembraneClipMgr.CurrentValue * 4.0f)
+            //{
+            //  singleMembraneData.Vector = singleMembraneData.Vector * -0.7f;
+            //  singleMembraneData.Position = (parameters.MembraneClipMgr.CurrentValue * 10.0f) * Math.Sign(singleMembraneData.Position);
+            //}
+
+            var clampPos = Math.Sign(singleMembraneData.Position) *
+              (float)Math.Min(posAbs * (1.0f + (1.0f - parameters.MembraneClipMgr.CurrentValue) * 4.0f),
+              parameters.MembraneClipMgr.CurrentValue * 8.0f);
+            channel[i] = newValue * (1.0f - parameters.MembraneMixMgr.CurrentValue) + clampPos * parameters.MembraneMixMgr.CurrentValue;
+          }
+          else
+          {
+            channel[i] = newValue;
+          }
+
+          channelnNr++;
         }
       }
     }
@@ -151,6 +193,12 @@ namespace Smx.Vst.Smx
       public float Detune { get; set; }
       public float DetuneVec { get; set; }
       public float Time { get; set; }
+    }
+
+    class MembraneData
+    {
+      public float Position { get; set; }
+      public float Vector { get; set; }
     }
   }
 }
