@@ -44,6 +44,7 @@ namespace Smx.Vst.Smx
     public VstParameterManager VoiceSpreadMgr { get; private set; }
     public VstParameterManager UniDetMgr { get; private set; }
     public VstParameterManager UniPanMgr { get; private set; }
+    public VstParameterManager TuneMgr { get; private set; }
     public VstParameterManager InTuAcMgr { get; private set; }
     public VstParameterManager InTuFrMgr { get; private set; }
     public VstParameterManager MembraneMixMgr { get; private set; }
@@ -169,6 +170,10 @@ namespace Smx.Vst.Smx
       UniPanMgr = CreateFloat(name: "UniPan",
                            label: "Unison Pan",
                            shortLabel: "Uni.Pan.");
+
+      TuneMgr = CreateFloat(name: "Tune",
+                     label: "Tune",
+                     shortLabel: "Tune");
 
       GenMgrs = new VstParameterManager[GeneratorList.List.Count];
       foreach (var gen in GeneratorList.List)

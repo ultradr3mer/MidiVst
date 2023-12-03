@@ -4,9 +4,7 @@ using Smx.Vst.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Markup;
 using VstNetAudioPlugin;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Smx.Vst.Smx
 {
@@ -19,9 +17,6 @@ namespace Smx.Vst.Smx
     private readonly double PiBy2 = Math.PI * 2.0;
     private Dictionary<byte, KeyData> keyDataDict = new Dictionary<byte, KeyData>();
     private HashSet<byte> keys = new HashSet<byte>();
-
-    private Dictionary<short, Ringbuffer<float>> decayBuffer = new Dictionary<short, Ringbuffer<float>>();
-    private Dictionary<short, MembraneData> ChannelMembrane = new Dictionary<short, MembraneData>();
 
     public SmxGenerator(PluginParameters parameters)
     {
@@ -114,11 +109,12 @@ namespace Smx.Vst.Smx
             int shiftNr = 0;
             double CalcTime(GeneratorList.GeneratorItem gen)
             {
-              return entry.Value.Time * noteFrequencies[entry.Key] * 2.0 * gen.Factor * (1.0 + shiftNr / 100.0 * parameters.UniDetMgr.CurrentValue)
+              return entry.Value.Time * noteFrequencies[entry.Key] * 4.0 * parameters.TuneMgr.CurrentValue * gen.Factor 
+                     * (1.0 + shiftNr / 100.0 * parameters.UniDetMgr.CurrentValue)
                      + parameters.UniPanMgr.CurrentValue * shiftNr++ / shifts.Count;
             }
 
-            var noteSample = (float)(entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1) 
+            var noteSample = (float)(entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1)
                             ? shifts.Aggregate(1.0, (a, s) => a * 1.5 * Wave(parameters.SawMgr.CurrentValue, CalcTime(s)))
                             : shifts.Sum(s => Wave(parameters.SawMgr.CurrentValue, CalcTime(s)))));
 
@@ -199,19 +195,13 @@ namespace Smx.Vst.Smx
       return Math.Pow(Math.Abs(combined), parameters.PowMgr.CurrentValue) * Math.Sign(combined);
     }
 
-    class KeyData
+    private class KeyData
     {
       public float Actuation { get; set; }
       public float Detune { get; set; }
       public float DetuneVec { get; set; }
       public double Time { get; set; }
       public Ringbuffer<float> VoiceBuffer { get; internal set; }
-    }
-
-    class MembraneData
-    {
-      public float Position { get; set; }
-      public float Vector { get; set; }
     }
   }
 }
