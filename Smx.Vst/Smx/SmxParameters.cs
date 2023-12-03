@@ -43,6 +43,8 @@ namespace Smx.Vst.Smx
     public VstParameterManager MembraneAcMgr { get; private set; }
     public VstParameterManager MembraneFrMgr { get; private set; }
     public VstParameterManager MembraneClipMgr { get; private set; }
+    public VstParameterManager VoiceCountMgr { get; private set; }
+    public VstParameterManager VoiceSpreadMgr { get; private set; }
     public VstParameterManager InTuAcMgr { get; private set; }
     public VstParameterManager InTuFrMgr { get; private set; }
     public VstParameterManager MembraneMixMgr { get; private set; }
@@ -102,6 +104,29 @@ namespace Smx.Vst.Smx
         .ToManager();
       }
 
+      VstParameterManager CreateInteger(string name, string label, string shortLabel, int max, int defaultValue = 0, int min = 0)
+      {
+        var paramInfo = new VstParameterInfo
+        {
+          Category = paramCategory,
+          CanBeAutomated = true,
+          Name = name,
+          Label = label,
+          ShortLabel = shortLabel,
+          MinInteger = min,
+          MaxInteger = max,
+          StepInteger = 1,
+          LargeStepInteger = 3,
+          DefaultValue = defaultValue,
+        };
+
+        parameterInfos.Add(paramInfo);
+
+        return paramInfo
+        .Normalize()
+        .ToManager();
+      }
+
       SawMgr = CreateFloat(name: SawParameterName,
                            label: "Saw Amount (1.0 Saw - 0.0 Sin)",
                            shortLabel: "Saw Amt.");
@@ -144,6 +169,16 @@ namespace Smx.Vst.Smx
             label: "Membrane Clip",
             shortLabel: "Mem.Cl.",
             defaultValue: 1.0f);
+
+      VoiceCountMgr = CreateInteger(name: "VoiCount",
+            label: "Voice Count",
+            shortLabel: "Voi.Cou.",
+            min: 1,
+            max: 16,
+            defaultValue: 1);
+      VoiceSpreadMgr = CreateFloat(name: "VoiSprd",
+            label: "Voice Spread",
+            shortLabel: "Voi.Spr.");
 
       GenMgrs = new VstParameterManager[GeneratorList.List.Count];
       GenPhaseMgrs = new VstParameterManager[GeneratorList.List.Count];

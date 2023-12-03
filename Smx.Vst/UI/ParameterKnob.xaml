@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Smx.Vst.UI" xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:local="clr-namespace:Smx.Vst.UI" xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" xmlns:viewmodels="clr-namespace:Smx.Vst.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:KnobViewModel}"
              mc:Ignorable="d" 
              Height="60" Width="300">
   <UserControl.Resources>
@@ -19,10 +19,9 @@
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
     <Label x:Name="label" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Content="{Binding Label, Mode=OneWay}" Padding="0"/>
-    <mah:NumericUpDown Minimum="0"
-                   Maximum="1"
-                   Interval="0.001" x:Name="textBox" HorizontalAlignment="Right" Width="120" Grid.Row="0" Value="{Binding Value, Mode=TwoWay}" Grid.Column="1" />
-    <Slider Visibility="{Binding SliderVisibility}" IsSnapToTickEnabled="False" Minimum="0" Maximum="1" x:Name="slider" HorizontalAlignment="Stretch" VerticalAlignment="Top" Value="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" Grid.ColumnSpan="2"/>
+    <mah:NumericUpDown Minimum="{Binding MinValue}" Maximum="{Binding MaxValue}"
+                   Interval="{Binding StepSize}" x:Name="textBox" HorizontalAlignment="Right" Width="120" Grid.Row="0" Value="{Binding Value, Mode=TwoWay}" Grid.Column="1" />
+    <Slider Visibility="{Binding SliderVisibility}" IsSnapToTickEnabled="{Binding IsInteger}" Minimum="{Binding MinValue}" Maximum="{Binding MaxValue}" x:Name="slider" HorizontalAlignment="Stretch" VerticalAlignment="Top" Value="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Grid.Row="2" Grid.ColumnSpan="2"/>
     <CheckBox Visibility="{Binding CheckboxVisibility}" HorizontalAlignment="Left" Grid.Row="2" IsChecked="{Binding IsValue, UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="2" />
   </Grid>
 </UserControl>
