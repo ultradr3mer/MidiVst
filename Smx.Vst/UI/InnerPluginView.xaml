@@ -17,7 +17,7 @@
     <ListBox x:Name="listBox" ItemsSource="{Binding GeneratorKnobs}" d:ItemsSource="{d:SampleData ItemCount=5}" >
       <ListBox.ItemTemplate>
         <DataTemplate >
-          <local:GeneratorView HorizontalAlignment="Left"/>
+          <CheckBox Content="{Binding Label}" IsChecked="{Binding IsValue}" HorizontalAlignment="Left"/>
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>

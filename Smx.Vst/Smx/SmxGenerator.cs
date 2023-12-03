@@ -111,9 +111,11 @@ namespace Smx.Vst.Smx
               return 0.0f;
             }
 
+            int shiftNr = 0;
             double CalcTime(GeneratorList.GeneratorItem gen)
             {
-              return entry.Value.Time * noteFrequencies[entry.Key] * 2.0 * gen.Factor + parameters.GenPhaseMgrs[gen.Index].CurrentValue;
+              return entry.Value.Time * noteFrequencies[entry.Key] * 2.0 * gen.Factor * (1.0 + shiftNr / 100.0 * parameters.UniDetMgr.CurrentValue)
+                     + parameters.UniPanMgr.CurrentValue * shiftNr++ / shifts.Count;
             }
 
             var noteSample = (float)(entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1) 
@@ -128,8 +130,6 @@ namespace Smx.Vst.Smx
             var buffer = entry.Value.VoiceBuffer;
             if (buffer == null)
             {
-              //var factor = shifts.Min(o => o.Factor);
-
               entry.Value.VoiceBuffer = buffer = new Ringbuffer<float>((int)(sampleRate
                                                                           / noteFrequencies[entry.Key]
                                                                           / shifts.Min(o => o.Factor)));
@@ -137,13 +137,6 @@ namespace Smx.Vst.Smx
 
             buffer.Add(noteSample);
             var totalSpread = (buffer.Size() * parameters.VoiceSpreadMgr.CurrentValue) - 1.0f;
-            //var maxIndex = (int)Math.Min(buffer.Count() * voiceCount / totalSpread, voiceCount) + 1;
-            //if (maxIndex <= 1)
-            //{
-            //  return noteSample;
-            //}
-
-            //var combinedSample = Enumerable.Range(0, maxIndex).Sum(voiceIndex => buffer.GetFromTop((int)(voiceIndex * totalSpread / voiceCount))) / maxIndex;
             double combinedSample = 0;
             for (int voiceIndex = 0; voiceIndex <= voiceCount; voiceIndex++)
             {
@@ -159,66 +152,7 @@ namespace Smx.Vst.Smx
           }
           );
 
-          //if (parameters.MembraneMixMgr.CurrentValue > 0)
-          //{
-          //  if (!ChannelMembrane.TryGetValue(channelnNr, out var singleMembraneData))
-          //  {
-          //    singleMembraneData = new MembraneData();
-          //    ChannelMembrane[channelnNr] = singleMembraneData;
-          //  }
-
-          //  var pull = (newValue - singleMembraneData.Position) * (float)Math.Exp(parameters.MembraneAcMgr.CurrentValue * 20f) / sampleRate;
-          //  pull = (float)Math.Pow(Math.Abs(pull), 2.0) * (float)Math.Sign(pull);
-          //  singleMembraneData.Vector += pull;
-          //  var vecAbs = Math.Abs(singleMembraneData.Vector);
-          //  var breaking = -Math.Min((float)Math.Pow(Math.Abs(singleMembraneData.Vector)
-          //    * parameters.MembraneFrMgr.CurrentValue, 2.0) * 1f / sampleRate, Math.Abs(singleMembraneData.Vector)) 
-          //    * (float)Math.Sign(singleMembraneData.Vector);
-          //  singleMembraneData.Vector += breaking;
-          //  singleMembraneData.Position += singleMembraneData.Vector / sampleRate;
-
-          //  var posAbs = Math.Abs(singleMembraneData.Position);
-
-          //  //if (posAbs > parameters.MembraneClipMgr.CurrentValue * 4.0f)
-          //  //{
-          //  //  singleMembraneData.Vector = singleMembraneData.Vector * -0.7f;
-          //  //  singleMembraneData.Position = (parameters.MembraneClipMgr.CurrentValue * 10.0f) * Math.Sign(singleMembraneData.Position);
-          //  //}
-
-          //  var clampPos = Math.Sign(singleMembraneData.Position) *
-          //    (float)Math.Min(posAbs * (1.0f + (1.0f - parameters.MembraneClipMgr.CurrentValue) * 4.0f),
-          //    parameters.MembraneClipMgr.CurrentValue * 8.0f);
-          //  channel[i] = newValue * (1.0f - parameters.MembraneMixMgr.CurrentValue) + clampPos * parameters.MembraneMixMgr.CurrentValue;
-          //}
-          //else
-          //{
-
-          //var voiceCount = (int)parameters.VoiceCountMgr.CurrentValue;
-          //if (voiceCount > 1)
-          //{
-          //  if (!decayBuffer.TryGetValue(channelnNr, out var singleDecayBuffer))
-          //  {
-          //    singleDecayBuffer = new Ringbuffer<float>(2000);
-          //    decayBuffer[channelnNr] = singleDecayBuffer;
-          //  }
-
-          //  singleDecayBuffer.Add(newValue);
-          //  var totalSpread = sampleRate / 20f * parameters.VoiceSpreadMgr.CurrentValue;
-          //  var maxIndex = (int)(singleDecayBuffer.Size() * voiceCount / totalSpread);
-          //  var combinedSample = Enumerable.Range(0, maxIndex).Sum(voiceIndex => singleDecayBuffer.GetFromTop((int)(totalSpread * voiceIndex / voiceCount))) / voiceCount;
-          //  channel[i] = combinedSample;
-          //  //for (int voiceIndex = 0; voiceIndex < voiceCount; voiceIndex++)
-          //  //{
-          //  //  int sampleIndex = (int)(totalSpread * voiceIndex / voiceCount);
-          //  //  float value = singleDecayBuffer.GetFromTop(sampleIndex);
-          //  //}
-          //}
-          //else
-          //{
           channel[i] = newValue;
-          //}
-
-          //}
 
           channelnNr++;
         }

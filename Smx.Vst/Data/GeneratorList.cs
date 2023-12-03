@@ -32,8 +32,6 @@ namespace Smx.Vst.Data
           DisplayName = $"{i}/12",
           ParameterName = $"Gen{i}/12",
           ParameterLabel = $"Generator {i}/12",
-          PhaseParameterName = $"Pha{i}/12",
-          PhaseParameterLabel = $"Phase {i}/12",
           Mult = i,
           Factor = i / 12.0,
         });
@@ -49,8 +47,6 @@ namespace Smx.Vst.Data
       public int Mult { get; set; }
       public int Index { get; set; }
       public string ParameterLabel { get; internal set; }
-      public string PhaseParameterName { get; internal set; }
-      public string PhaseParameterLabel { get; internal set; }
 
       public override string ToString()
       {

@@ -40,17 +40,15 @@ namespace Smx.Vst.Smx
     public VstParameterManager PowMgr;
 
     public VstParameterManager IniDetMgr { get; private set; }
-    public VstParameterManager MembraneAcMgr { get; private set; }
-    public VstParameterManager MembraneFrMgr { get; private set; }
-    public VstParameterManager MembraneClipMgr { get; private set; }
     public VstParameterManager VoiceCountMgr { get; private set; }
     public VstParameterManager VoiceSpreadMgr { get; private set; }
+    public VstParameterManager UniDetMgr { get; private set; }
+    public VstParameterManager UniPanMgr { get; private set; }
     public VstParameterManager InTuAcMgr { get; private set; }
     public VstParameterManager InTuFrMgr { get; private set; }
     public VstParameterManager MembraneMixMgr { get; private set; }
     public VstParameterManager SawMgr { get; private set; }
     public VstParameterManager[] GenMgrs { get; private set; }
-    public VstParameterManager[] GenPhaseMgrs { get; private set; }
 
     // This method initializes the plugin parameters this Dsp component owns.
     private void InitializeParameters(PluginParameters parameters)
@@ -155,21 +153,6 @@ namespace Smx.Vst.Smx
                   label: "Initial Detune Friction",
                   shortLabel: "I.De.Fr.");
 
-      MembraneMixMgr = CreateFloat(name: "MemMix",
-            label: "Membrane Wet/Dry",
-            shortLabel: "Mem.Mix");
-      MembraneAcMgr = CreateFloat(name: "MemAc",
-                  label: "Membrane Acceleration",
-                  shortLabel: "Mem.Ac.");
-      MembraneFrMgr = CreateFloat(name: "MemFr",
-                  label: "Membrane Friction",
-                  shortLabel: "Mem.Fr.",
-                  defaultValue: 0.5f);
-      MembraneClipMgr = CreateFloat(name: "MemClp",
-            label: "Membrane Clip",
-            shortLabel: "Mem.Cl.",
-            defaultValue: 1.0f);
-
       VoiceCountMgr = CreateInteger(name: "VoiCount",
             label: "Voice Count",
             shortLabel: "Voi.Cou.",
@@ -180,17 +163,19 @@ namespace Smx.Vst.Smx
             label: "Voice Spread",
             shortLabel: "Voi.Spr.");
 
+      UniDetMgr = CreateFloat(name: "UniDet",
+                           label: "Unison Detune",
+                           shortLabel: "Uni.Det.");
+      UniPanMgr = CreateFloat(name: "UniPan",
+                           label: "Unison Pan",
+                           shortLabel: "Uni.Pan.");
+
       GenMgrs = new VstParameterManager[GeneratorList.List.Count];
-      GenPhaseMgrs = new VstParameterManager[GeneratorList.List.Count];
       foreach (var gen in GeneratorList.List)
       {
-
         GenMgrs[gen.Index] = CreateSwitch(name: gen.ParameterName,
                              label: gen.ParameterLabel,
                              shortLabel: gen.DisplayName);
-        GenPhaseMgrs[gen.Index] = CreateFloat(name: gen.PhaseParameterName,
-                     label: gen.PhaseParameterLabel,
-                     shortLabel: gen.DisplayName);
       }
     }
   }
