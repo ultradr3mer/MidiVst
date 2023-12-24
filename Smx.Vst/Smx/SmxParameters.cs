@@ -83,7 +83,7 @@ namespace Smx.Vst.Smx
         .ToManager();
       }
 
-      VstParameterManager CreateSwitch(string name, string label, string shortLabel)
+      VstParameterManager CreateSwitch(string name, string label, string shortLabel, bool defaultValue = false)
       {
         var paramInfo = new VstParameterInfo
         {
@@ -93,7 +93,7 @@ namespace Smx.Vst.Smx
           Label = label,
           ShortLabel = shortLabel,
           IsSwitch = true,
-          DefaultValue = 0
+          DefaultValue = defaultValue ? 1 : 0
         };
 
         parameterInfos.Add(paramInfo);
@@ -173,14 +173,16 @@ namespace Smx.Vst.Smx
 
       TuneMgr = CreateFloat(name: "Tune",
                      label: "Tune",
-                     shortLabel: "Tune");
+                     shortLabel: "Tune",
+                     defaultValue: 0.5f);
 
       GenMgrs = new VstParameterManager[GeneratorList.List.Count];
       foreach (var gen in GeneratorList.List)
       {
         GenMgrs[gen.Index] = CreateSwitch(name: gen.ParameterName,
                              label: gen.ParameterLabel,
-                             shortLabel: gen.DisplayName);
+                             shortLabel: gen.DisplayName,
+                             defaultValue: gen.Factor == 1.0f);
       }
     }
   }

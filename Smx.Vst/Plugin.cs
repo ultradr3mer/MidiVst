@@ -27,7 +27,9 @@ namespace Smx.Vst
 
     protected override void ConfigureServices(IServiceCollection services)
     {
-      var test = new MetroWindow();
+      // This Call fixes XAML error 
+      var hack = new MetroWindow();
+      
       services.AddSingleton<PluginParameters>()
                 .AddSingletonAll<PluginPrograms>()
                 .AddSingleton<VstMidiProgram>()

@@ -92,7 +92,7 @@ namespace Smx.Vst.Smx
           }
         }
 
-        var shifts = GeneratorList.List.Where(g => parameters.GenMgrs[g.Index].CurrentValue == 1)
+        var gens = GeneratorList.List.Where(g => parameters.GenMgrs[g.Index].CurrentValue == 1)
                                       .ToList();
 
         var voiceCount = (int)parameters.VoiceCountMgr.CurrentValue;
@@ -101,50 +101,33 @@ namespace Smx.Vst.Smx
         {
           var newValue = (float)keyDataDict.Sum(entry =>
           {
-            if (!shifts.Any())
+            if (!gens.Any())
             {
               return 0.0f;
             }
 
-            int shiftNr = 0;
-            double CalcTime(GeneratorList.GeneratorItem gen)
+            var shiftPerVoice = parameters.VoiceSpreadMgr.CurrentValue 
+                                  / noteFrequencies[entry.Key] 
+                                  / gens.Min(o => o.Factor);
+
+            var noteSample = Enumerable.Range(0, voiceCount).Sum(v =>
             {
-              return entry.Value.Time * noteFrequencies[entry.Key] * 4.0 * parameters.TuneMgr.CurrentValue * gen.Factor 
-                     * (1.0 + shiftNr / 100.0 * parameters.UniDetMgr.CurrentValue)
-                     + parameters.UniPanMgr.CurrentValue * shiftNr++ / shifts.Count;
-            }
+              var voiceTime = entry.Value.Time + shiftPerVoice * v;
 
-            var noteSample = (float)(entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1)
-                            ? shifts.Aggregate(1.0, (a, s) => a * 1.5 * Wave(parameters.SawMgr.CurrentValue, CalcTime(s)))
-                            : shifts.Sum(s => Wave(parameters.SawMgr.CurrentValue, CalcTime(s)))));
+              int shiftNr = 0;
+              double CalcTime(GeneratorList.GeneratorItem gen)
+              {
+                return voiceTime * noteFrequencies[entry.Key] * 4.0 * parameters.TuneMgr.CurrentValue * gen.Factor
+                       * (1.0 + shiftNr / 100.0 * parameters.UniDetMgr.CurrentValue)
+                       + parameters.UniPanMgr.CurrentValue * shiftNr++ / gens.Count;
+              }
 
-            if (voiceCount <= 1 || parameters.VoiceSpreadMgr.CurrentValue <= 0.0001f)
-            {
-              return noteSample;
-            }
+              return (float)(entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1)
+                              ? gens.Aggregate(1.0, (a, g) => a * 1.5 * Wave(parameters.SawMgr.CurrentValue, CalcTime(g)))
+                              : gens.Sum(g => Wave(parameters.SawMgr.CurrentValue, CalcTime(g)))));
+            });
 
-            var buffer = entry.Value.VoiceBuffer;
-            if (buffer == null)
-            {
-              entry.Value.VoiceBuffer = buffer = new Ringbuffer<float>((int)(sampleRate
-                                                                          / noteFrequencies[entry.Key]
-                                                                          / shifts.Min(o => o.Factor)));
-            }
-
-            buffer.Add(noteSample);
-            var totalSpread = (buffer.Size() * parameters.VoiceSpreadMgr.CurrentValue) - 1.0f;
-            double combinedSample = 0;
-            for (int voiceIndex = 0; voiceIndex <= voiceCount; voiceIndex++)
-            {
-              int sampleIndex = (int)(voiceIndex * totalSpread / voiceCount);
-              if (buffer.Count() <= sampleIndex)
-                continue;
-
-              float value = buffer.GetFromTop(sampleIndex);
-              combinedSample += value;
-            }
-
-            return combinedSample / voiceCount;
+            return noteSample / voiceCount;
           }
           );
 
@@ -201,7 +184,6 @@ namespace Smx.Vst.Smx
       public float Detune { get; set; }
       public float DetuneVec { get; set; }
       public double Time { get; set; }
-      public Ringbuffer<float> VoiceBuffer { get; internal set; }
     }
   }
 }
