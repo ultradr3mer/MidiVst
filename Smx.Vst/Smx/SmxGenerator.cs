@@ -36,6 +36,8 @@ namespace Smx.Vst.Smx
       {
         filterList.Add(new Filter(filterParameter));
       }
+
+      var test = new AudioEngine();
     }
 
     public bool IsPlaying => keys.Any() || keyDataDict.Any();
@@ -141,8 +143,8 @@ namespace Smx.Vst.Smx
               }
 
               return (entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1)
-                              ? gens.Aggregate(1.0, (a, g) => a * 1.5 * Wave(parameters.SawMgr.CurrentValue, CalcTime(g)))
-                              : gens.Sum(g => Wave(parameters.SawMgr.CurrentValue, CalcTime(g)))));
+                              ? gens.Aggregate(1.0, (a, g) => a * 1.5 * AudioEngine.Wave(parameters.SawMgr.CurrentValue, CalcTime(g), parameters.PowMgr.CurrentValue))
+                              : gens.Sum(g => AudioEngine.Wave(parameters.SawMgr.CurrentValue, CalcTime(g), parameters.PowMgr.CurrentValue))));
             });
 
             return noteSample / voiceCount;

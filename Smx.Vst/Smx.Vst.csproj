@@ -23,4 +23,14 @@
     <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
     <PackageReference Include="VST.NET2-Plugin" Version="2.1.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Smx.Native.Managed\Smx.Native.Managed.vcxproj">
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy /y &quot;$(TargetDir)Smx.Native.Managed.dll&quot; &quot;$(TargetDir)deploy\Smx.Native.Managed.dll&quot;&#xD;&#xA;copy /y &quot;$(TargetDir)Smx.Native.Managed.pdb&quot; &quot;$(TargetDir)deploy\Smx.Native.Managed.pdb&quot;" />
+  </Target>
 </Project>
