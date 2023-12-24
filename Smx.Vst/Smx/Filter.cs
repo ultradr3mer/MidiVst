@@ -6,34 +6,11 @@ namespace Smx.Vst.Smx
 {
   internal class Filter
   {
-    public class FilterParameter
-    {
-      public FilterParameter(VstParameterManager modeMgrs,
-                             VstParameterManager cutoffMgr,
-                             VstParameterManager dryWetMgr)
-      {
-        ModeMgrs = modeMgrs;
-        CutoffMgr = cutoffMgr;
-        DryWetMgr = dryWetMgr;
-      }
-
-      public VstParameterManager CutoffMgr { get; private set; }
-      public VstParameterManager DryWetMgr { get; private set; }
-      public VstParameterManager ModeMgrs { get; private set; }
-    }
+    private readonly FilterParameter parameters;
 
     private double buf0;
 
     private double buf1;
-    private readonly FilterParameter parameters;
-
-    //private double cutoff;
-
-    //private double feedbackMount;
-
-    //private double dryWet;
-
-    //private Mode mode;
 
     public Filter(FilterParameter parameters)
     {
@@ -43,36 +20,74 @@ namespace Smx.Vst.Smx
     public enum Mode
     {
       None,
-      Lowpass,
-      Highpass,
-      Bandpass
+      LowpassMix,
+      HighpassMix,
+      BandpassMix,
+      LowpassAdd,
+      HighpassAdd,
+      BandpassAdd,
     }
 
     public double Process(double inputValue)
     {
-      return AudioMath.Mix(inputValue, ProcessInternal(inputValue), parameters.DryWetMgr.CurrentValue);
+      var mode = (Mode)parameters.ModeMgrs.CurrentValue;
+      var wet = ProcessInternal(inputValue, mode);
+      var wetAmt = parameters.DryWetMgr.CurrentValue;
+      return mode >= Mode.LowpassAdd ? (inputValue + wet * wetAmt)
+        : mode >= Mode.LowpassMix ? AudioMath.Mix(inputValue, wet, wetAmt)
+        : inputValue;
     }
 
-    private double ProcessInternal(double inputValue)
+    private double CalcFeedbackAmmount(double cutoff)
+    {
+      var feedback = (double)parameters.ResonanceMgr.CurrentValue;
+      feedback += feedback / (1.0 - AudioMath.Clamp(cutoff, 0.99, 0.01));
+      return feedback;
+    }
+
+    private double ProcessInternal(double inputValue, Mode mode)
     {
       var cutoff = Math.Pow(parameters.CutoffMgr.CurrentValue, 4.0);
-      //buf0 += cutoff * (inputValue - buf0 + feedbackAmount * (buf0 - buf1));
-      buf0 += cutoff * (inputValue - buf0);
+      double feedback = CalcFeedbackAmmount(cutoff);
+
+      buf0 += cutoff * (inputValue - buf0 + feedback * (buf0 - buf1));
       buf1 += cutoff * (buf0 - buf1);
-      switch ((Mode)parameters.ModeMgrs.CurrentValue)
+      switch (mode)
       {
-        case Mode.Lowpass:
+        case Mode.LowpassMix:
+        case Mode.LowpassAdd:
           return buf1;
 
-        case Mode.Highpass:
+        case Mode.HighpassMix:
+        case Mode.HighpassAdd:
           return inputValue - buf0;
 
-        case Mode.Bandpass:
+        case Mode.BandpassMix:
+        case Mode.BandpassAdd:
           return buf0 - buf1;
 
-        default:
-          return 0.0;
+        default: 
+          return inputValue;
       }
+    }
+
+    public class FilterParameter
+    {
+      public FilterParameter(VstParameterManager modeMgrs,
+                             VstParameterManager cutoffMgr,
+                             VstParameterManager dryWetMgr,
+                             VstParameterManager resonanceMgr)
+      {
+        ModeMgrs = modeMgrs;
+        CutoffMgr = cutoffMgr;
+        DryWetMgr = dryWetMgr;
+        ResonanceMgr = resonanceMgr;
+      }
+
+      public VstParameterManager CutoffMgr { get; }
+      public VstParameterManager DryWetMgr { get; }
+      public VstParameterManager ModeMgrs { get; }
+      public VstParameterManager ResonanceMgr { get; }
     }
   }
 }

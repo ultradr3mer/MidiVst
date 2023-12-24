@@ -195,14 +195,19 @@ namespace Smx.Vst.Smx
                                                                    label: "Filter Mode " + i,
                                                                    shortLabel: "Fil.Md." + i,
                                                                    min: (int)Filter.Mode.None,
-                                                                   max: (int)Filter.Mode.Bandpass,
+                                                                   max: (int)Filter.Mode.BandpassAdd,
                                                                    defaultValue: (int)Filter.Mode.None),
                                            cutoffMgr: CreateFloat(name: "FltrCut" + i,
                                                                   label: "Filter Cutoff " + i,
-                                                                  shortLabel: "Fil.Ct." + i),
+                                                                  shortLabel: "Fil.Ct." + i,
+                                                                  defaultValue: 0.5f),
                                            dryWetMgr: CreateFloat(name: "FltrDrW" + i,
                                                                   label: "Filter Dry/Wet " + i,
-                                                                  shortLabel: "Fl.D.W." + i));
+                                                                  shortLabel: "Fl.D.W." + i,
+                                                                  defaultValue: 1.0f),
+                                           resonanceMgr: CreateFloat(name: "FltrRes" + i,
+                                                                  label: "Filter Resonance " + i,
+                                                                  shortLabel: "Fl.F.b." + i));
         FilterParameterAry[i] = p;
       }
 

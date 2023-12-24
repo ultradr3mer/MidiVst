@@ -3,7 +3,9 @@ using Smx.Vst.Collections;
 using Smx.Vst.Data;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using VstNetAudioPlugin;
 
 namespace Smx.Vst.Smx
@@ -18,11 +20,22 @@ namespace Smx.Vst.Smx
     private Dictionary<byte, KeyData> keyDataDict = new Dictionary<byte, KeyData>();
     private HashSet<byte> keys = new HashSet<byte>();
 
-    private Dictionary<short, List<Filter>> channelFilterDict = new Dictionary<short, List<Filter>>();
+    private List<Filter> filterList = new List<Filter>();
+
+    Stopwatch sw = new Stopwatch();
+    private long processedSamples = 0;
+    private long runtimeTicks = 0;
+
+    //private Dictionary<short, List<Filter>> channelFilterDict = new Dictionary<short, List<Filter>>();
 
     public SmxGenerator(PluginParameters parameters)
     {
       this.parameters = parameters.SmxParameters;
+
+      foreach (var filterParameter in this.parameters.FilterParameterAry)
+      {
+        filterList.Add(new Filter(filterParameter));
+      }
     }
 
     public bool IsPlaying => keys.Any() || keyDataDict.Any();
@@ -30,6 +43,8 @@ namespace Smx.Vst.Smx
 
     internal void Generate(float sampleRate, VstAudioBuffer[] outChannels)
     {
+      sw.Restart();
+
       int length = outChannels[0].SampleCount;
       for (int sampleIndex = 0; sampleIndex < length; sampleIndex++)
       {
@@ -99,9 +114,7 @@ namespace Smx.Vst.Smx
                                       .ToList();
 
         var voiceCount = (int)parameters.VoiceCountMgr.CurrentValue;
-        short channelnNr = 0;
-        foreach (var channel in outChannels)
-        {
+
           var value = keyDataDict.Sum(entry =>
           {
             if (!gens.Any())
@@ -136,25 +149,29 @@ namespace Smx.Vst.Smx
           }
           );
 
-          if(!channelFilterDict.TryGetValue(channelnNr, out var filterList))
-          {
-            filterList = new List<Filter>();
-            foreach (var filterParameter in parameters.FilterParameterAry)
-            {
-              filterList.Add(new Filter(filterParameter));
-            }
-            channelFilterDict.Add(channelnNr, filterList);
-          }
-
           int filterCount = (int)parameters.FilterCountMgr.CurrentValue;
           foreach (var item in filterList.Take(filterCount))
           {
             value = item.Process(value);
           }
 
+        short channelnNr = 0;
+        foreach (var channel in outChannels)
+        {
           channel[sampleIndex] = (float)value;
-
           channelnNr++;
+        }
+
+        sw.Stop();
+        runtimeTicks += sw.ElapsedTicks;
+        processedSamples += length;
+
+        if(processedSamples >= sampleRate)
+        {
+          var processedTicks = (long)(length / sampleRate * TimeSpan.TicksPerSecond);
+          Debug.WriteLine($"Runtime {runtimeTicks / processedTicks * 100:0.00}% {(float)runtimeTicks / (float)TimeSpan.TicksPerMillisecond:0.000}ms for {processedSamples} samples");
+          runtimeTicks = 0;
+          processedSamples = 0;
         }
       }
     }
