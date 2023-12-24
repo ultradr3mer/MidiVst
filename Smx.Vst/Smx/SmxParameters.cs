@@ -6,6 +6,7 @@ using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using VstNetAudioPlugin;
+using static Smx.Vst.Smx.Filter;
 
 namespace Smx.Vst.Smx
 {
@@ -14,12 +15,14 @@ namespace Smx.Vst.Smx
   /// </summary>
   internal sealed class SmxParameters
   {
-    public const string SawParameterName = "Saw";
     public const string AttackParameterName = "Attack";
-    public const string ReleaseParameterName = "Release";
     public const string FmModParameterName = "FmMod";
     public const string PowParameterName = "Pow";
-
+    public const string ReleaseParameterName = "Release";
+    public const string SawParameterName = "Saw";
+    public VstParameterManager AttackMgr;
+    public VstParameterManager PowMgr;
+    public VstParameterManager ReleaseMgr;
     private const string ParameterCategoryName = "Smx";
 
     /// <summary>
@@ -33,23 +36,21 @@ namespace Smx.Vst.Smx
       InitializeParameters(parameters);
     }
 
+    public VstParameterManager FilterCountMgr { get; private set; }
+    public FilterParameter[] FilterParameterAry { get; private set; }
     public VstParameterManager FmModMgr { get; private set; }
-
-    public VstParameterManager AttackMgr;
-    public VstParameterManager ReleaseMgr;
-    public VstParameterManager PowMgr;
-
+    public VstParameterManager[] GenMgrs { get; private set; }
     public VstParameterManager IniDetMgr { get; private set; }
-    public VstParameterManager VoiceCountMgr { get; private set; }
-    public VstParameterManager VoiceSpreadMgr { get; private set; }
-    public VstParameterManager UniDetMgr { get; private set; }
-    public VstParameterManager UniPanMgr { get; private set; }
-    public VstParameterManager TuneMgr { get; private set; }
     public VstParameterManager InTuAcMgr { get; private set; }
     public VstParameterManager InTuFrMgr { get; private set; }
     public VstParameterManager MembraneMixMgr { get; private set; }
     public VstParameterManager SawMgr { get; private set; }
-    public VstParameterManager[] GenMgrs { get; private set; }
+    public VstParameterManager TuneMgr { get; private set; }
+    public VstParameterManager UniDetMgr { get; private set; }
+    public VstParameterManager UniPanMgr { get; private set; }
+    public VstParameterManager VoiceCountMgr { get; private set; }
+    public VstParameterManager VoiceDetuneMgr { get; private set; }
+    public VstParameterManager VoiceSpreadMgr { get; private set; }
 
     // This method initializes the plugin parameters this Dsp component owns.
     private void InitializeParameters(PluginParameters parameters)
@@ -160,6 +161,9 @@ namespace Smx.Vst.Smx
             min: 1,
             max: 16,
             defaultValue: 1);
+      VoiceDetuneMgr = CreateFloat(name: "VoiDet",
+            label: "Voice Detune",
+            shortLabel: "Voi.Det.");
       VoiceSpreadMgr = CreateFloat(name: "VoiSprd",
             label: "Voice Spread",
             shortLabel: "Voi.Spr.");
@@ -175,6 +179,32 @@ namespace Smx.Vst.Smx
                      label: "Tune",
                      shortLabel: "Tune",
                      defaultValue: 0.5f);
+
+      FilterCountMgr = CreateInteger(name: "FltrCt",
+                  label: "Filter Count",
+                  shortLabel: "Fil.Cnt.",
+                  min: 0,
+                  max: 4,
+                  defaultValue: (int)Filter.Mode.None);
+
+      int maxFilterCount = 4;
+      FilterParameterAry = new FilterParameter[maxFilterCount];
+      for (int i = 0; i < 4; i++)
+      {
+        var p = new Filter.FilterParameter(modeMgrs: CreateInteger(name: "FltrMd" + i,
+                                                                   label: "Filter Mode " + i,
+                                                                   shortLabel: "Fil.Md." + i,
+                                                                   min: (int)Filter.Mode.None,
+                                                                   max: (int)Filter.Mode.Bandpass,
+                                                                   defaultValue: (int)Filter.Mode.None),
+                                           cutoffMgr: CreateFloat(name: "FltrCut" + i,
+                                                                  label: "Filter Cutoff " + i,
+                                                                  shortLabel: "Fil.Ct." + i),
+                                           dryWetMgr: CreateFloat(name: "FltrDrW" + i,
+                                                                  label: "Filter Dry/Wet " + i,
+                                                                  shortLabel: "Fl.D.W." + i));
+        FilterParameterAry[i] = p;
+      }
 
       GenMgrs = new VstParameterManager[GeneratorList.List.Count];
       foreach (var gen in GeneratorList.List)

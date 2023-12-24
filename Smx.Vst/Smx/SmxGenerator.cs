@@ -18,6 +18,8 @@ namespace Smx.Vst.Smx
     private Dictionary<byte, KeyData> keyDataDict = new Dictionary<byte, KeyData>();
     private HashSet<byte> keys = new HashSet<byte>();
 
+    private Dictionary<short, List<Filter>> channelFilterDict = new Dictionary<short, List<Filter>>();
+
     public SmxGenerator(PluginParameters parameters)
     {
       this.parameters = parameters.SmxParameters;
@@ -25,10 +27,11 @@ namespace Smx.Vst.Smx
 
     public bool IsPlaying => keys.Any() || keyDataDict.Any();
 
+
     internal void Generate(float sampleRate, VstAudioBuffer[] outChannels)
     {
       int length = outChannels[0].SampleCount;
-      for (int i = 0; i < length; i++)
+      for (int sampleIndex = 0; sampleIndex < length; sampleIndex++)
       {
         foreach (var key in keys)
         {
@@ -99,7 +102,7 @@ namespace Smx.Vst.Smx
         short channelnNr = 0;
         foreach (var channel in outChannels)
         {
-          var newValue = (float)keyDataDict.Sum(entry =>
+          var value = keyDataDict.Sum(entry =>
           {
             if (!gens.Any())
             {
@@ -112,7 +115,9 @@ namespace Smx.Vst.Smx
 
             var noteSample = Enumerable.Range(0, voiceCount).Sum(v =>
             {
-              var voiceTime = entry.Value.Time + shiftPerVoice * v;
+              var voiceTime = entry.Value.Time 
+                      * (1.0 + v / 10.0 * parameters.VoiceDetuneMgr.CurrentValue) 
+                      + shiftPerVoice * v;
 
               int shiftNr = 0;
               double CalcTime(GeneratorList.GeneratorItem gen)
@@ -122,7 +127,7 @@ namespace Smx.Vst.Smx
                        + parameters.UniPanMgr.CurrentValue * shiftNr++ / gens.Count;
               }
 
-              return (float)(entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1)
+              return (entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1)
                               ? gens.Aggregate(1.0, (a, g) => a * 1.5 * Wave(parameters.SawMgr.CurrentValue, CalcTime(g)))
                               : gens.Sum(g => Wave(parameters.SawMgr.CurrentValue, CalcTime(g)))));
             });
@@ -131,7 +136,23 @@ namespace Smx.Vst.Smx
           }
           );
 
-          channel[i] = newValue;
+          if(!channelFilterDict.TryGetValue(channelnNr, out var filterList))
+          {
+            filterList = new List<Filter>();
+            foreach (var filterParameter in parameters.FilterParameterAry)
+            {
+              filterList.Add(new Filter(filterParameter));
+            }
+            channelFilterDict.Add(channelnNr, filterList);
+          }
+
+          int filterCount = (int)parameters.FilterCountMgr.CurrentValue;
+          foreach (var item in filterList.Take(filterCount))
+          {
+            value = item.Process(value);
+          }
+
+          channel[sampleIndex] = (float)value;
 
           channelnNr++;
         }
