@@ -3,9 +3,9 @@
 public ref class KeyData
 {
   public:
-    float Actuation;
-    float Detune;
-    float DetuneVec;
+    double Actuation;
+    double Detune;
+    double DetuneVec;
     double Time;
     double KeyFrequency;
 };

@@ -10,6 +10,8 @@ public ref class EngineParameter
 public:
   int FilterCount;
   bool FmMod;
+  float Attack;
+  float Release;
   float InitialDetune;
   float InitialDetuneAcceleration;
   float InitialDetuneFriction;
@@ -22,9 +24,16 @@ public:
   float VoiceSpread;
   float VoiceDetune;
   float MinGenFactor;
+  float SampleRate;
 
-  List<FilterParameter^>^ FilterParameter;
+  EngineParameter() {
+    ActiveKeys = gcnew Dictionary<short, KeyData^>();
+    ActiveFilter = gcnew List<FilterParameter^>();
+    ActiveGenerators = gcnew List<GeneratorParameter^>();
+  };
+
+  List<FilterParameter^>^ ActiveFilter;
   List<GeneratorParameter^>^ ActiveGenerators;
-  List<KeyData^>^ ActiveKeys;
+  Dictionary<short, KeyData^>^ ActiveKeys;
 };
 

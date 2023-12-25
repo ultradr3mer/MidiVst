@@ -5,7 +5,7 @@
 AudioEngine::AudioEngine(EngineParameter^ params)
 {
   this->params = params;
-  this->noteFrequencies = &InitializeNoteFrequencies();
+  this->noteFrequencies = InitializeNoteFrequencies();
 }
 
 AudioEngine::~AudioEngine()
@@ -40,6 +40,87 @@ double AudioEngine::Wave(double saw, double t, double pow)
   return std::pow(std::abs(combined), pow) * std::copysign(1.0, combined);
 }
 
+void AudioEngine::UpdateKeys(HashSet<short>^ currentKeys)
+{
+  for each (short key in currentKeys)
+  {
+    KeyData^ data;
+    if (!params->ActiveKeys->TryGetValue(key, data))
+    {
+      data = gcnew KeyData();
+      data->Actuation;
+      data->Detune = pow(params->InitialDetune * 2.0f, 2.0),
+        data->KeyFrequency = noteFrequencies[key];
+
+      params->ActiveKeys[key] = data;
+    }
+
+    if (data->Actuation < 1)
+    {
+      if (params->Attack == 0)
+      {
+        data->Actuation = 1;
+      }
+      else
+      {
+        data->Actuation = fmin(data->Actuation + 1.0 / params->Attack / params->SampleRate, 1.0);
+      }
+    }
+  }
+
+  for each(auto item in params->ActiveKeys)
+  {
+    float sampleRate = params->SampleRate;
+    auto data = item.Value;
+    if (data->Detune != 1.0 || data->DetuneVec != 0.0)
+    {
+      double pull = (1.0 - data->Detune) * params->InitialDetuneAcceleration * 100000.0;
+      double scaledFriction = params->InitialDetuneFriction / sampleRate * 1000.0;
+      data->DetuneVec = (data->DetuneVec + pull / sampleRate) * (1.0 - scaledFriction);
+      data->Detune += data->DetuneVec / sampleRate;
+      data->Time += data->Detune / sampleRate;
+    }
+    else
+    {
+      data->Time += 1.0 / sampleRate;
+    }
+
+    if (currentKeys->Contains(item.Key))
+    {
+      continue;
+    }
+
+    float keyActuation;
+    if (params->Release == 0)
+    {
+      keyActuation = 0;
+    }
+    else
+    {
+      keyActuation = fmax(data->Actuation - 1.0 / params->Release / sampleRate, 0.0);
+    }
+
+    if (keyActuation <= 0)
+    {
+      params->ActiveKeys->Remove(item.Key);
+    }
+    else
+    {
+      params->ActiveKeys[item.Key]->Actuation = keyActuation;
+    }
+  }
+}
+
+double AudioEngine::GenerateKeys()
+{
+  double sample = 0.0;
+  for each (KeyData ^ keyData in params->ActiveKeys->Values)
+  {
+    sample += GenerateKey(keyData);
+  }
+  return sample;
+}
+
 double AudioEngine::GenerateKey(KeyData^ data)
 {
   int length = params->VoiceCount;
@@ -52,18 +133,17 @@ double AudioEngine::GenerateKey(KeyData^ data)
 }
 
 double AudioEngine::GenerateVoice(KeyData^ data, int vocieNr) {
-
   double shiftPerVoice = params->VoiceSpread / data->KeyFrequency / params->MinGenFactor;
   double voiceTime = data->Time * (1.0 + vocieNr / 10.0 * params->VoiceDetune) + shiftPerVoice * vocieNr;
 
   int shiftNr = 0;
   double generatorAggregate = params->FmMod ? 1.0 : 0.0;
 
-  for each (GeneratorParameter^ genPara in params->ActiveGenerators)
+  for each (GeneratorParameter ^ genPara in params->ActiveGenerators)
   {
-    auto time =  voiceTime * data->KeyFrequency * 4.0 * params->Tune * genPara->Factor
-     * (1.0 + shiftNr / 100.0 * params->UniDetune)
-     + params->UniPan * shiftNr++ / params->ActiveGenerators->Count;
+    auto time = voiceTime * data->KeyFrequency * 4.0 * params->Tune * genPara->Factor
+      * (1.0 + shiftNr / 100.0 * params->UniDetune)
+      + params->UniPan * shiftNr++ / params->ActiveGenerators->Count;
 
     double sample = AudioEngine::Wave(params->SawAmount, time, params->Pow);
 
@@ -73,9 +153,9 @@ double AudioEngine::GenerateVoice(KeyData^ data, int vocieNr) {
   return generatorAggregate;
 }
 
-std::map<int, float> AudioEngine::InitializeNoteFrequencies()
+Dictionary<int, float>^ AudioEngine::InitializeNoteFrequencies()
 {
-  std::map<int, float> result;
+  auto result = gcnew Dictionary<int, float>();
 
   float a4Frequency = 440.0f;
   float multiplier = pow(2.0f, 1.0f / 12.0f);

@@ -20,8 +20,8 @@ namespace Smx.Vst.Smx
     private static readonly Dictionary<int, float> noteFrequencies = Enumerable.Range(0, 127).ToDictionary(x => x, x => (float)(a4Frequency * Math.Pow(multiplyer, x - 69)));
     private readonly SmxParameters parameters;
     private readonly double PiBy2 = Math.PI * 2.0;
-    private Dictionary<byte, KeyData> keyDataDict = new Dictionary<byte, KeyData>();
-    private HashSet<byte> keys = new HashSet<byte>();
+    //private Dictionary<short, KeyData> keyDataDict = new Dictionary<short, KeyData>();
+    private HashSet<short> keys = new HashSet<short>();
 
     //private List<Filter> filterList = new List<Filter>();
 
@@ -45,11 +45,13 @@ namespace Smx.Vst.Smx
       nativeEngine = new AudioEngine(nativeParameter);
     }
 
-    public bool IsPlaying => keys.Any() || keyDataDict.Any();
+    public bool IsPlaying => this.keys.Any() || this.nativeParameter.ActiveKeys.Any();
 
     internal void Generate(float sampleRate, VstAudioBuffer[] outChannels)
     {
       //nativeParameter.FilterCount = (int)parameters.FilterCountMgr.CurrentValue;
+      nativeParameter.SampleRate = sampleRate;
+      nativeParameter.Attack = parameters.AttackMgr.CurrentValue;
       nativeParameter.FmMod = parameters.FmModMgr.CurrentValue == 1;
       nativeParameter.InitialDetune = parameters.IniDetMgr.CurrentValue;
       nativeParameter.InitialDetuneAcceleration = parameters.InTuAcMgr.CurrentValue;
@@ -68,72 +70,7 @@ namespace Smx.Vst.Smx
       int length = outChannels[0].SampleCount;
       for (int sampleIndex = 0; sampleIndex < length; sampleIndex++)
       {
-        foreach (var key in keys)
-        {
-          if (!keyDataDict.TryGetValue(key, out KeyData keyActuation))
-          {
-            keyActuation = new KeyData()
-            {
-              Actuation = 0,
-              Detune = (float)Math.Pow(parameters.IniDetMgr.CurrentValue * 2.0f, 2.0),
-              KeyFrequency = SmxGenerator.noteFrequencies[key],
-            };
-            keyDataDict[key] = keyActuation;
-          }
-
-          if (keyActuation.Actuation < 1)
-          {
-            if (parameters.AttackMgr.CurrentValue == 0)
-            {
-              keyActuation.Actuation = 1;
-            }
-            else
-            {
-              keyActuation.Actuation = (float)Math.Min(keyActuation.Actuation + 1.0 / parameters.AttackMgr.CurrentValue / sampleRate, 1.0);
-            }
-          }
-        }
-
-        foreach (var item in keyDataDict)
-        {
-          var data = item.Value;
-          if (data.Detune != 1.0 || data.DetuneVec != 0.0)
-          {
-            var pull = (1.0f - data.Detune) * parameters.InTuAcMgr.CurrentValue * 100000f;
-            var scaledFriction = parameters.InTuFrMgr.CurrentValue / sampleRate * 1000f;
-            data.DetuneVec = (data.DetuneVec + pull / sampleRate) * (1.0f - scaledFriction);
-            data.Detune += data.DetuneVec / sampleRate;
-            data.Time += data.Detune / sampleRate;
-          }
-          else
-          {
-            data.Time += 1.0f / sampleRate;
-          }
-
-          if (keys.Contains(item.Key))
-          {
-            continue;
-          }
-
-          float keyActuation;
-          if (parameters.ReleaseMgr.CurrentValue == 0)
-          {
-            keyActuation = 0;
-          }
-          else
-          {
-            keyActuation = (float)Math.Max(item.Value.Actuation - 1.0 / parameters.ReleaseMgr.CurrentValue / sampleRate, 0.0);
-          }
-
-          if (keyActuation <= 0)
-          {
-            keyDataDict.Remove(item.Key);
-          }
-          else
-          {
-            keyDataDict[item.Key].Actuation = keyActuation;
-          }
-        }
+        nativeEngine.UpdateKeys(keys);
 
         var gens = GeneratorList.List.Where(g => parameters.GenMgrs[g.Index].CurrentValue == 1)
                                       .ToList();
@@ -143,9 +80,8 @@ namespace Smx.Vst.Smx
         {
           nativeParameter.ActiveGenerators = gens.OfType<GeneratorParameter>().ToList();
           nativeParameter.MinGenFactor = (float)nativeParameter.ActiveGenerators.Min(g => g.Factor);
-          nativeParameter.ActiveKeys = keyDataDict.Values.ToList();
 
-          value = keyDataDict.Sum(entry => this.nativeEngine.GenerateKey(entry.Value));
+          value = nativeEngine.GenerateKeys();
         }
 
         //int filterCount = (int)parameters.FilterCountMgr.CurrentValue;

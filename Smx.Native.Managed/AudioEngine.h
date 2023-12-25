@@ -13,10 +13,12 @@ public:
   ~AudioEngine(); 
 
   static double Wave(double saw, double t, double pow);
+  void UpdateKeys(HashSet<short>^ currentKeys);
+  double GenerateKeys();
   double GenerateKey(KeyData^ data);
   double GenerateVoice(KeyData^ data, int voiceNr);
 private:
-  std::map<int, float> InitializeNoteFrequencies();
-  std::map<int, float>* noteFrequencies;
+  Dictionary<int, float>^ InitializeNoteFrequencies();
+  Dictionary<int, float>^ noteFrequencies;
   EngineParameter^ params;
 };
