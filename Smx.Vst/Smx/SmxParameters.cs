@@ -6,7 +6,7 @@ using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using VstNetAudioPlugin;
-using static Smx.Vst.Smx.Filter;
+//using static Smx.Vst.Smx.Filter;
 
 namespace Smx.Vst.Smx
 {
@@ -180,36 +180,36 @@ namespace Smx.Vst.Smx
                      shortLabel: "Tune",
                      defaultValue: 0.5f);
 
-      FilterCountMgr = CreateInteger(name: "FltrCt",
-                  label: "Filter Count",
-                  shortLabel: "Fil.Cnt.",
-                  min: 0,
-                  max: 4,
-                  defaultValue: (int)Filter.Mode.None);
+      //FilterCountMgr = CreateInteger(name: "FltrCt",
+      //            label: "Filter Count",
+      //            shortLabel: "Fil.Cnt.",
+      //            min: 0,
+      //            max: 4,
+      //            defaultValue: (int)Filter.Mode.None);
 
-      int maxFilterCount = 4;
-      FilterParameterAry = new FilterParameter[maxFilterCount];
-      for (int i = 0; i < 4; i++)
-      {
-        var p = new Filter.FilterParameter(modeMgrs: CreateInteger(name: "FltrMd" + i,
-                                                                   label: "Filter Mode " + i,
-                                                                   shortLabel: "Fil.Md." + i,
-                                                                   min: (int)Filter.Mode.None,
-                                                                   max: (int)Filter.Mode.BandpassAdd,
-                                                                   defaultValue: (int)Filter.Mode.None),
-                                           cutoffMgr: CreateFloat(name: "FltrCut" + i,
-                                                                  label: "Filter Cutoff " + i,
-                                                                  shortLabel: "Fil.Ct." + i,
-                                                                  defaultValue: 0.5f),
-                                           dryWetMgr: CreateFloat(name: "FltrDrW" + i,
-                                                                  label: "Filter Dry/Wet " + i,
-                                                                  shortLabel: "Fl.D.W." + i,
-                                                                  defaultValue: 1.0f),
-                                           resonanceMgr: CreateFloat(name: "FltrRes" + i,
-                                                                  label: "Filter Resonance " + i,
-                                                                  shortLabel: "Fl.F.b." + i));
-        FilterParameterAry[i] = p;
-      }
+      //int maxFilterCount = 4;
+      //FilterParameterAry = new FilterParameter[maxFilterCount];
+      //for (int i = 0; i < 4; i++)
+      //{
+      //  var p = new Filter.FilterParameter(modeMgrs: CreateInteger(name: "FltrMd" + i,
+      //                                                             label: "Filter Mode " + i,
+      //                                                             shortLabel: "Fil.Md." + i,
+      //                                                             min: (int)Filter.Mode.None,
+      //                                                             max: (int)Filter.Mode.BandpassAdd,
+      //                                                             defaultValue: (int)Filter.Mode.None),
+      //                                     cutoffMgr: CreateFloat(name: "FltrCut" + i,
+      //                                                            label: "Filter Cutoff " + i,
+      //                                                            shortLabel: "Fil.Ct." + i,
+      //                                                            defaultValue: 0.5f),
+      //                                     dryWetMgr: CreateFloat(name: "FltrDrW" + i,
+      //                                                            label: "Filter Dry/Wet " + i,
+      //                                                            shortLabel: "Fl.D.W." + i,
+      //                                                            defaultValue: 1.0f),
+      //                                     resonanceMgr: CreateFloat(name: "FltrRes" + i,
+      //                                                            label: "Filter Resonance " + i,
+      //                                                            shortLabel: "Fl.F.b." + i));
+      //  FilterParameterAry[i] = p;
+      //}
 
       GenMgrs = new VstParameterManager[GeneratorList.List.Count];
       foreach (var gen in GeneratorList.List)

@@ -4,8 +4,11 @@ using Smx.Vst.Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using System.Windows.Markup;
 using VstNetAudioPlugin;
 
 namespace Smx.Vst.Smx
@@ -20,31 +23,46 @@ namespace Smx.Vst.Smx
     private Dictionary<byte, KeyData> keyDataDict = new Dictionary<byte, KeyData>();
     private HashSet<byte> keys = new HashSet<byte>();
 
-    private List<Filter> filterList = new List<Filter>();
+    //private List<Filter> filterList = new List<Filter>();
 
-    Stopwatch sw = new Stopwatch();
+    private AudioEngine nativeEngine;
+    private EngineParameter nativeParameter;
     private long processedSamples = 0;
     private long runtimeTicks = 0;
-
+    private Stopwatch sw = new Stopwatch();
     //private Dictionary<short, List<Filter>> channelFilterDict = new Dictionary<short, List<Filter>>();
 
     public SmxGenerator(PluginParameters parameters)
     {
       this.parameters = parameters.SmxParameters;
 
-      foreach (var filterParameter in this.parameters.FilterParameterAry)
-      {
-        filterList.Add(new Filter(filterParameter));
-      }
+      //foreach (var filterParameter in this.parameters.FilterParameterAry)
+      //{
+      //  filterList.Add(new Filter(filterParameter));
+      //}
 
-      var test = new AudioEngine();
+      nativeParameter = new EngineParameter();
+      nativeEngine = new AudioEngine(nativeParameter);
     }
 
     public bool IsPlaying => keys.Any() || keyDataDict.Any();
 
-
     internal void Generate(float sampleRate, VstAudioBuffer[] outChannels)
     {
+      //nativeParameter.FilterCount = (int)parameters.FilterCountMgr.CurrentValue;
+      nativeParameter.FmMod = parameters.FmModMgr.CurrentValue == 1;
+      nativeParameter.InitialDetune = parameters.IniDetMgr.CurrentValue;
+      nativeParameter.InitialDetuneAcceleration = parameters.InTuAcMgr.CurrentValue;
+      nativeParameter.InitialDetuneFriction = parameters.InTuFrMgr.CurrentValue;
+      nativeParameter.Tune = parameters.TuneMgr.CurrentValue;
+      nativeParameter.Pow = parameters.PowMgr.CurrentValue;
+      nativeParameter.VoiceCount = (int)parameters.VoiceCountMgr.CurrentValue;
+      nativeParameter.VoiceSpread = parameters.VoiceSpreadMgr.CurrentValue;
+      nativeParameter.VoiceDetune = parameters.VoiceDetuneMgr.CurrentValue;
+      nativeParameter.UniDetune = parameters.UniDetMgr.CurrentValue;
+      nativeParameter.UniPan = parameters.UniPanMgr.CurrentValue;
+      nativeParameter.SawAmount = parameters.SawMgr.CurrentValue;
+
       sw.Restart();
 
       int length = outChannels[0].SampleCount;
@@ -54,7 +72,12 @@ namespace Smx.Vst.Smx
         {
           if (!keyDataDict.TryGetValue(key, out KeyData keyActuation))
           {
-            keyActuation = new KeyData() { Actuation = 0, Detune = (float)Math.Pow(parameters.IniDetMgr.CurrentValue * 2.0f, 2.0) };
+            keyActuation = new KeyData()
+            {
+              Actuation = 0,
+              Detune = (float)Math.Pow(parameters.IniDetMgr.CurrentValue * 2.0f, 2.0),
+              KeyFrequency = SmxGenerator.noteFrequencies[key],
+            };
             keyDataDict[key] = keyActuation;
           }
 
@@ -115,47 +138,20 @@ namespace Smx.Vst.Smx
         var gens = GeneratorList.List.Where(g => parameters.GenMgrs[g.Index].CurrentValue == 1)
                                       .ToList();
 
-        var voiceCount = (int)parameters.VoiceCountMgr.CurrentValue;
+        double value = 0.0;
+        if (gens.Any())
+        {
+          nativeParameter.ActiveGenerators = gens.OfType<GeneratorParameter>().ToList();
+          nativeParameter.MinGenFactor = (float)nativeParameter.ActiveGenerators.Min(g => g.Factor);
 
-          var value = keyDataDict.Sum(entry =>
-          {
-            if (!gens.Any())
-            {
-              return 0.0f;
-            }
+          value = keyDataDict.Sum(entry => this.GenerateNote(entry.Value));
+        }
 
-            var shiftPerVoice = parameters.VoiceSpreadMgr.CurrentValue 
-                                  / noteFrequencies[entry.Key] 
-                                  / gens.Min(o => o.Factor);
-
-            var noteSample = Enumerable.Range(0, voiceCount).Sum(v =>
-            {
-              var voiceTime = entry.Value.Time 
-                      * (1.0 + v / 10.0 * parameters.VoiceDetuneMgr.CurrentValue) 
-                      + shiftPerVoice * v;
-
-              int shiftNr = 0;
-              double CalcTime(GeneratorList.GeneratorItem gen)
-              {
-                return voiceTime * noteFrequencies[entry.Key] * 4.0 * parameters.TuneMgr.CurrentValue * gen.Factor
-                       * (1.0 + shiftNr / 100.0 * parameters.UniDetMgr.CurrentValue)
-                       + parameters.UniPanMgr.CurrentValue * shiftNr++ / gens.Count;
-              }
-
-              return (entry.Value.Actuation * ((parameters.FmModMgr.CurrentValue == 1)
-                              ? gens.Aggregate(1.0, (a, g) => a * 1.5 * AudioEngine.Wave(parameters.SawMgr.CurrentValue, CalcTime(g), parameters.PowMgr.CurrentValue))
-                              : gens.Sum(g => AudioEngine.Wave(parameters.SawMgr.CurrentValue, CalcTime(g), parameters.PowMgr.CurrentValue))));
-            });
-
-            return noteSample / voiceCount;
-          }
-          );
-
-          int filterCount = (int)parameters.FilterCountMgr.CurrentValue;
-          foreach (var item in filterList.Take(filterCount))
-          {
-            value = item.Process(value);
-          }
+        //int filterCount = (int)parameters.FilterCountMgr.CurrentValue;
+        //foreach (var item in filterList.Take(filterCount))
+        //{
+        //  value = item.Process(value);
+        //}
 
         short channelnNr = 0;
         foreach (var channel in outChannels)
@@ -168,7 +164,7 @@ namespace Smx.Vst.Smx
         runtimeTicks += sw.ElapsedTicks;
         processedSamples += length;
 
-        if(processedSamples >= sampleRate)
+        if (processedSamples >= sampleRate)
         {
           var processedTicks = (long)(length / sampleRate * TimeSpan.TicksPerSecond);
           Debug.WriteLine($"Runtime {runtimeTicks / processedTicks * 100:0.00}% {(float)runtimeTicks / (float)TimeSpan.TicksPerMillisecond:0.000}ms for {processedSamples} samples");
@@ -186,6 +182,37 @@ namespace Smx.Vst.Smx
     internal void ProcessNoteOnEvent(byte v)
     {
       keys.Add(v);
+    }
+
+    private double GenerateNote(KeyData data)
+    {
+      var voiceCount = (int)parameters.VoiceCountMgr.CurrentValue;
+
+      var noteSample = Enumerable.Range(0, voiceCount).Sum(v => this.nativeEngine.GenerateVoice(data, v));
+
+      return noteSample;
+    }
+
+    private double GenerateVoice(byte key, KeyData data, List<GeneratorList.GeneratorItem> gens, int v)
+    {
+      var shiftPerVoice = parameters.VoiceSpreadMgr.CurrentValue
+                      / noteFrequencies[key]
+                      / gens.Min(o => o.Factor);
+      var voiceTime = data.Time
+                * (1.0 + v / 10.0 * parameters.VoiceDetuneMgr.CurrentValue)
+                + shiftPerVoice * v;
+
+      int shiftNr = 0;
+      double CalcTime(GeneratorParameter genPara)
+      {
+        return voiceTime * noteFrequencies[key] * 4.0 * parameters.TuneMgr.CurrentValue * genPara.Factor
+               * (1.0 + shiftNr / 100.0 * parameters.UniDetMgr.CurrentValue)
+               + parameters.UniPanMgr.CurrentValue * shiftNr++ / gens.Count();
+      }
+
+      return (data.Actuation * ((parameters.FmModMgr.CurrentValue == 1)
+                      ? gens.Aggregate(1.0, (a, g) => a * 1.5 * AudioEngine.Wave(parameters.SawMgr.CurrentValue, CalcTime(g), parameters.PowMgr.CurrentValue))
+                      : gens.Sum(g => AudioEngine.Wave(parameters.SawMgr.CurrentValue, CalcTime(g), parameters.PowMgr.CurrentValue))));
     }
 
     private double Wave(double saw, double t)
@@ -216,14 +243,6 @@ namespace Smx.Vst.Smx
       double combined = (1 - saw) * sin_wave + saw * saw_wave;
 
       return Math.Pow(Math.Abs(combined), parameters.PowMgr.CurrentValue) * Math.Sign(combined);
-    }
-
-    private class KeyData
-    {
-      public float Actuation { get; set; }
-      public float Detune { get; set; }
-      public float DetuneVec { get; set; }
-      public double Time { get; set; }
     }
   }
 }

@@ -4,18 +4,18 @@
 #include <map>
 #include <vector>
 #include "KeyData.h"
+#include "GeneratorParametersUnmanaged2.h"
 
 using namespace System::Collections::Generic;
 
-public ref class AudioEngine {
+public class AudioEngineUnmanaged {
 public:
-  AudioEngine(EngineParameter^ params);
-  ~AudioEngine(); 
+  AudioEngineUnmanaged();
+  ~AudioEngineUnmanaged(); 
 
   static double Wave(double saw, double t, double pow);
-  double GenerateVoice(KeyData^ data, int v);
 private:
   std::map<int, float> InitializeNoteFrequencies();
-  std::map<int, float>* noteFrequencies;
-  EngineParameter^ params;
+  //double GenerateVoice(unsigned char key, KeyData data, std::vector<GeneratorParameterUnmanaged> gens, int v);
+  std::map<int, float> noteFrequencies;
 };

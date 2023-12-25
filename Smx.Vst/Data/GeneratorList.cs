@@ -39,13 +39,13 @@ namespace Smx.Vst.Data
       return list;
     }
 
-    public class GeneratorItem
+    public class GeneratorItem : GeneratorParameter
     {
       public string DisplayName { get; set; }
       public string ParameterName { get; set; }
-      public double Factor { get; set; }
-      public int Mult { get; set; }
-      public int Index { get; set; }
+      //public double Factor { get; set; }
+      //public int Mult { get; set; }
+      //public int Index { get; set; }
       public string ParameterLabel { get; internal set; }
 
       public override string ToString()

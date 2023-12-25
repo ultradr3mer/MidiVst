@@ -2,12 +2,15 @@
 #include <cmath>
 #include "math.h"
 
-AudioEngine::AudioEngine()
+AudioEngine::AudioEngine(EngineParameter^ params)
 {
+  this->params = params;
+  this->noteFrequencies = &InitializeNoteFrequencies();
 }
 
 AudioEngine::~AudioEngine()
 {
+  delete this->noteFrequencies;
 }
 
 double AudioEngine::Wave(double saw, double t, double pow)
@@ -35,4 +38,40 @@ double AudioEngine::Wave(double saw, double t, double pow)
   double combined = (1 - saw) * sin_wave + saw * saw_wave;
 
   return std::pow(std::abs(combined), pow) * std::copysign(1.0, combined);
+}
+
+double AudioEngine::GenerateVoice(KeyData^ data, int v) {
+
+  double shiftPerVoice = params->VoiceSpread / data->KeyFrequency / params->MinGenFactor;
+  double voiceTime = data->Time * (1.0 + v / 10.0 * params->VoiceDetune) + shiftPerVoice * v;
+
+  int shiftNr = 0;
+  double aggregate = params->FmMod ? 1.0 : 0.0;
+
+  for each (GeneratorParameter^ genPara in params->ActiveGenerators)
+  {
+    auto time =  voiceTime * data->KeyFrequency * 4.0 * params->Tune * genPara->Factor
+     * (1.0 + shiftNr / 100.0 * params->UniDetune)
+     + params->UniPan * shiftNr++ / params->ActiveGenerators->Count;
+
+    double sample = AudioEngine::Wave(params->SawAmount, time, params->Pow);
+
+    aggregate = params->FmMod ? aggregate * 1.5 * sample : aggregate + sample;
+  }
+
+  return aggregate / params->VoiceCount;
+}
+
+std::map<int, float> AudioEngine::InitializeNoteFrequencies()
+{
+  std::map<int, float> result;
+
+  float a4Frequency = 440.0f;
+  float multiplier = pow(2.0f, 1.0f / 12.0f);
+
+  for (int x = 0; x < 127; ++x) {
+    result[x] = static_cast<float>(a4Frequency * pow(multiplier, x - 69));
+  }
+
+  return result;
 }
