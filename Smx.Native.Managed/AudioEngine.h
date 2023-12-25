@@ -14,6 +14,8 @@ public:
 
   static double Wave(double saw, double t, double pow);
   void UpdateKeys(HashSet<short>^ currentKeys);
+  void Run(HashSet<short>^ currentKeys, int length, array<float*>^ outBuffer);
+  double GenerateSample(HashSet<short>^ currentKeys);
   double GenerateKeys();
   double GenerateKey(KeyData^ data);
   double GenerateVoice(KeyData^ data, int voiceNr);

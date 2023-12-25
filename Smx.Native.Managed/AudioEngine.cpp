@@ -68,7 +68,7 @@ void AudioEngine::UpdateKeys(HashSet<short>^ currentKeys)
     }
   }
 
-  for each(auto item in params->ActiveKeys)
+  for each (auto item in params->ActiveKeys)
   {
     float sampleRate = params->SampleRate;
     auto data = item.Value;
@@ -109,6 +109,32 @@ void AudioEngine::UpdateKeys(HashSet<short>^ currentKeys)
       params->ActiveKeys[item.Key]->Actuation = keyActuation;
     }
   }
+}
+
+void AudioEngine::Run(HashSet<short>^ currentKeys, int length, array<float*>^ outBuffer)
+{
+  int channelCount = outBuffer->Length;
+  for (int i = 0; i < length; i++)
+  {
+    float sample = GenerateSample(currentKeys);
+
+    for (int channelIndex = 0; channelIndex < channelCount; channelIndex++)
+    {
+      float *ptr = outBuffer[channelIndex];
+      *ptr = sample;
+      ptr++;
+      outBuffer[channelIndex] = ptr;
+    }
+  }
+}
+
+double AudioEngine::GenerateSample(HashSet<short>^ currentKeys)
+{
+  UpdateKeys(currentKeys);
+
+  double sample = GenerateKeys();
+
+  return sample;
 }
 
 double AudioEngine::GenerateKeys()

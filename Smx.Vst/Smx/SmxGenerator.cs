@@ -20,6 +20,7 @@ namespace Smx.Vst.Smx
     private static readonly Dictionary<int, float> noteFrequencies = Enumerable.Range(0, 127).ToDictionary(x => x, x => (float)(a4Frequency * Math.Pow(multiplyer, x - 69)));
     private readonly SmxParameters parameters;
     private readonly double PiBy2 = Math.PI * 2.0;
+
     //private Dictionary<short, KeyData> keyDataDict = new Dictionary<short, KeyData>();
     private HashSet<short> keys = new HashSet<short>();
 
@@ -49,6 +50,7 @@ namespace Smx.Vst.Smx
 
     internal void Generate(float sampleRate, VstAudioBuffer[] outChannels)
     {
+      sw.Restart();
       //nativeParameter.FilterCount = (int)parameters.FilterCountMgr.CurrentValue;
       nativeParameter.SampleRate = sampleRate;
       nativeParameter.Attack = parameters.AttackMgr.CurrentValue;
@@ -64,50 +66,34 @@ namespace Smx.Vst.Smx
       nativeParameter.UniDetune = parameters.UniDetMgr.CurrentValue;
       nativeParameter.UniPan = parameters.UniPanMgr.CurrentValue;
       nativeParameter.SawAmount = parameters.SawMgr.CurrentValue;
-
-      sw.Restart();
+      nativeParameter.ActiveGenerators = GeneratorList.List.Where(g => parameters.GenMgrs[g.Index].CurrentValue == 1)
+                                        .OfType<GeneratorParameter>()
+                                        .ToList();
+      nativeParameter.MinGenFactor = (float)nativeParameter.ActiveGenerators.Min(g => g.Factor);
 
       int length = outChannels[0].SampleCount;
-      for (int sampleIndex = 0; sampleIndex < length; sampleIndex++)
+      unsafe
       {
-        nativeEngine.UpdateKeys(keys);
-
-        var gens = GeneratorList.List.Where(g => parameters.GenMgrs[g.Index].CurrentValue == 1)
-                                      .ToList();
-
-        double value = 0.0;
-        if (gens.Any())
+        int channelCount = outChannels.Length;
+        var bufferAry = new float*[channelCount];
+        for (int i = 0; i < channelCount; i++)
         {
-          nativeParameter.ActiveGenerators = gens.OfType<GeneratorParameter>().ToList();
-          nativeParameter.MinGenFactor = (float)nativeParameter.ActiveGenerators.Min(g => g.Factor);
-
-          value = nativeEngine.GenerateKeys();
+          bufferAry[i] = ((IDirectBufferAccess32)outChannels[i]).Buffer;
         }
 
-        //int filterCount = (int)parameters.FilterCountMgr.CurrentValue;
-        //foreach (var item in filterList.Take(filterCount))
-        //{
-        //  value = item.Process(value);
-        //}
+        nativeEngine.Run(keys, length, bufferAry);
+      }
 
-        short channelnNr = 0;
-        foreach (var channel in outChannels)
-        {
-          channel[sampleIndex] = (float)value;
-          channelnNr++;
-        }
+      sw.Stop();
+      runtimeTicks += sw.ElapsedTicks;
+      processedSamples += length;
 
-        sw.Stop();
-        runtimeTicks += sw.ElapsedTicks;
-        processedSamples += length;
-
-        if (processedSamples >= sampleRate)
-        {
-          var processedTicks = (long)(length / sampleRate * TimeSpan.TicksPerSecond);
-          Debug.WriteLine($"Runtime {runtimeTicks / processedTicks * 100:0.00}% {(float)runtimeTicks / (float)TimeSpan.TicksPerMillisecond:0.000}ms for {processedSamples} samples");
-          runtimeTicks = 0;
-          processedSamples = 0;
-        }
+      if (processedSamples >= sampleRate)
+      {
+        var processedTicks = (long)(processedSamples * TimeSpan.TicksPerSecond / sampleRate);
+        Debug.WriteLine($"Runtime {runtimeTicks / processedTicks * 100:0.00}% {(float)runtimeTicks / (float)TimeSpan.TicksPerSecond}ms for {processedSamples} samples");
+        runtimeTicks = 0;
+        processedSamples = 0;
       }
     }
 
