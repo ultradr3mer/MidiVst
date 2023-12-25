@@ -10,7 +10,7 @@
   <ControlTemplate x:Key='RotaryDailCenterButton' TargetType='{x:Type Button}'>
     <Grid>
       <Ellipse x:Name='Ell' Width='{TemplateBinding Width}' Height='{TemplateBinding Height}'
-                Fill="{StaticResource MahApps.Brushes.Menu.Background}"
+                Fill="{StaticResource MahApps.Brushes.Button.Background}"
                 Stroke="{StaticResource MahApps.Brushes.Button.Border}"
                StrokeThickness="1.0" >
       </Ellipse>
@@ -27,6 +27,33 @@
         <Setter TargetName="Ell" Property="StrokeThickness" Value="2.0" />
       </Trigger>
       <Trigger Property="IsPressed" Value="True">
+        <Setter TargetName="Ell" Property="Stroke" Value="{StaticResource MahApps.Brushes.Button.Border.Focus}" />
+        <Setter TargetName="Ell" Property="Fill" Value="{StaticResource MahApps.Brushes.Button.Flat.Background.MouseOver}" />
+        <Setter TargetName="Ell" Property="StrokeThickness" Value="2.0" />
+      </Trigger>
+    </ControlTemplate.Triggers>
+  </ControlTemplate>
+
+  <ControlTemplate x:Key='RotaryDailCenterCircle' TargetType='{x:Type Panel}'>
+    <Grid>
+      <Ellipse x:Name='Ell' Width='{TemplateBinding Width}' Height='{TemplateBinding Height}'
+               Fill="{StaticResource MahApps.Brushes.Button.Background}"
+               Stroke="{StaticResource MahApps.Brushes.Button.Border}"
+              StrokeThickness="1.0" >
+      </Ellipse>
+      <!--<Viewbox>
+        <ContentControl Margin='10' Content='{TemplateBinding Content}'
+                       FontSize='11' HorizontalContentAlignment='Center'
+                       Foreground='{StaticResource MahApps.Brushes.Button.Flat.Foreground}' />
+      </Viewbox>-->
+    </Grid>
+    <ControlTemplate.Triggers>
+      <Trigger Property="IsMouseOver" Value="True">
+        <Setter TargetName="Ell" Property="Stroke" Value="{StaticResource MahApps.Brushes.Button.Border.Focus}" />
+        <Setter TargetName="Ell" Property="Fill" Value="{StaticResource MahApps.Brushes.Button.Flat.Background.Pressed}" />
+        <Setter TargetName="Ell" Property="StrokeThickness" Value="2.0" />
+      </Trigger>
+      <Trigger Property="{Binding IsPressed}" Value="True">
         <Setter TargetName="Ell" Property="Stroke" Value="{StaticResource MahApps.Brushes.Button.Border.Focus}" />
         <Setter TargetName="Ell" Property="Fill" Value="{StaticResource MahApps.Brushes.Button.Flat.Background.MouseOver}" />
         <Setter TargetName="Ell" Property="StrokeThickness" Value="2.0" />
