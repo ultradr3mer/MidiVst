@@ -143,8 +143,9 @@ namespace Smx.Vst.Smx
         {
           nativeParameter.ActiveGenerators = gens.OfType<GeneratorParameter>().ToList();
           nativeParameter.MinGenFactor = (float)nativeParameter.ActiveGenerators.Min(g => g.Factor);
+          nativeParameter.ActiveKeys = keyDataDict.Values.ToList();
 
-          value = keyDataDict.Sum(entry => this.GenerateNote(entry.Value));
+          value = keyDataDict.Sum(entry => this.nativeEngine.GenerateKey(entry.Value));
         }
 
         //int filterCount = (int)parameters.FilterCountMgr.CurrentValue;

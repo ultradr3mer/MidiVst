@@ -13,7 +13,8 @@ public:
   ~AudioEngine(); 
 
   static double Wave(double saw, double t, double pow);
-  double GenerateVoice(KeyData^ data, int v);
+  double GenerateKey(KeyData^ data);
+  double GenerateVoice(KeyData^ data, int voiceNr);
 private:
   std::map<int, float> InitializeNoteFrequencies();
   std::map<int, float>* noteFrequencies;

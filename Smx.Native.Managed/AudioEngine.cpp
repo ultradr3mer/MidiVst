@@ -40,13 +40,24 @@ double AudioEngine::Wave(double saw, double t, double pow)
   return std::pow(std::abs(combined), pow) * std::copysign(1.0, combined);
 }
 
-double AudioEngine::GenerateVoice(KeyData^ data, int v) {
+double AudioEngine::GenerateKey(KeyData^ data)
+{
+  int length = params->VoiceCount;
+  double sample = 0.0;
+  for (int i = 0; i < length; i++)
+  {
+    sample += GenerateVoice(data, i);
+  }
+  return sample / length;
+}
+
+double AudioEngine::GenerateVoice(KeyData^ data, int vocieNr) {
 
   double shiftPerVoice = params->VoiceSpread / data->KeyFrequency / params->MinGenFactor;
-  double voiceTime = data->Time * (1.0 + v / 10.0 * params->VoiceDetune) + shiftPerVoice * v;
+  double voiceTime = data->Time * (1.0 + vocieNr / 10.0 * params->VoiceDetune) + shiftPerVoice * vocieNr;
 
   int shiftNr = 0;
-  double aggregate = params->FmMod ? 1.0 : 0.0;
+  double generatorAggregate = params->FmMod ? 1.0 : 0.0;
 
   for each (GeneratorParameter^ genPara in params->ActiveGenerators)
   {
@@ -56,10 +67,10 @@ double AudioEngine::GenerateVoice(KeyData^ data, int v) {
 
     double sample = AudioEngine::Wave(params->SawAmount, time, params->Pow);
 
-    aggregate = params->FmMod ? aggregate * 1.5 * sample : aggregate + sample;
+    generatorAggregate = params->FmMod ? generatorAggregate * 1.5 * sample : generatorAggregate + sample / params->ActiveGenerators->Count;
   }
 
-  return aggregate / params->VoiceCount;
+  return generatorAggregate;
 }
 
 std::map<int, float> AudioEngine::InitializeNoteFrequencies()

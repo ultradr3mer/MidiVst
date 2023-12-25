@@ -1,6 +1,7 @@
 #pragma once
 #include "FilterParameter.h"
 #include "GeneratorParameter.h"
+#include "KeyData.h"
 
 using namespace System::Collections::Generic;
 
@@ -24,5 +25,6 @@ public:
 
   List<FilterParameter^>^ FilterParameter;
   List<GeneratorParameter^>^ ActiveGenerators;
+  List<KeyData^>^ ActiveKeys;
 };
 
