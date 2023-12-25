@@ -1,6 +1,7 @@
 ﻿using Jacobi.Vst.Core;
 using Jacobi.Vst.Plugin.Framework;
 using Jacobi.Vst.Plugin.Framework.Common;
+using Smx.Vst.Smx;
 using System;
 using System.Drawing;
 using System.Linq;
@@ -52,13 +53,13 @@ namespace VstNetAudioPlugin
 
         public void Open(IntPtr hWnd)
         {
-            // make a list of parameters to pass to the dlg.
-            var paramList = _parameters.ParameterInfos
-                .Where(p => p.ParameterManager != null)
-                .Select(p => p.ParameterManager!)
-                .ToList();
+            //// make a list of parameters to pass to the dlg.
+            //var paramList = _parameters.ParameterInfos
+            //    .Where(p => p.ParameterManager != null)
+            //    .Select(p => p.ParameterManager!)
+            //    .ToList();
 
-            _view.SafeInstance.InitializeParameters(paramList);
+            _view.SafeInstance.InitializeParameters(_parameters);
 
             _view.Open(hWnd);
         }

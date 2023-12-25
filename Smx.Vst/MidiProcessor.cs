@@ -5,6 +5,7 @@
   using Jacobi.Vst.Plugin.Framework;
   using System;
   using System.Collections.Concurrent;
+  using System.Diagnostics;
 
   /// <summary>
   /// Manages incoming midi events and sents them to the <see cref="SampleManager"/>.

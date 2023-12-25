@@ -1,4 +1,5 @@
 ﻿using Jacobi.Vst.Plugin.Framework;
+using Smx.Vst.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,7 +14,7 @@ namespace Smx.Vst.ViewModels
 {
   internal class KnobViewModel : INotifyPropertyChanged
   {
-    private VstParameterManager mgr;
+    private SmxParameterManager mgr;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -27,7 +28,7 @@ namespace Smx.Vst.ViewModels
     public bool IsInteger { get; private set; }
     public double StepSize { get; private set; }
 
-    public KnobViewModel(VstParameterManager item)
+    public KnobViewModel(SmxParameterManager item)
     {
       this.mgr = item;
       this.Label = item.ParameterInfo.Label;
@@ -77,16 +78,16 @@ namespace Smx.Vst.ViewModels
     {
       if (e.PropertyName == nameof(Value))
       {
-        if (mgr.ActiveParameter != null)
-        {
-          mgr.ActiveParameter.Value = (float)this.Value;
-        }
+        this.mgr.CurrentValue = (float)this.Value;
       }
     }
 
     private void Item_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-      this.Value = mgr.CurrentValue;
+      if (e.PropertyName == nameof(SmxParameterManager.CurrentValue))
+      {
+        this.Value = mgr.CurrentValue;
+      }
     }
   }
 }

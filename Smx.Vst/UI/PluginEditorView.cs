@@ -32,13 +32,12 @@ namespace VstNetAudioPlugin.UI
       this.Controls.Add(host);
     }
 
-    internal bool InitializeParameters(IList<VstParameterManager> parameters)
+    internal bool InitializeParameters(PluginParameters parameters)
     {
       this.viewModel.InitializeParameters(parameters);
 
       return true;
     }
-
     internal void ProcessIdle()
     {
       // TODO: short idle processing here

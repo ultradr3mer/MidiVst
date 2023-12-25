@@ -49,7 +49,7 @@ void AudioEngine::UpdateKeys(HashSet<short>^ currentKeys)
     {
       data = gcnew KeyData();
       data->Actuation;
-      data->Detune = pow(params->InitialDetune * 2.0f, 2.0),
+      data->Detune = pow(params->InitialDetune, 2.0),
         data->KeyFrequency = noteFrequencies[key];
 
       params->ActiveKeys[key] = data;
@@ -183,7 +183,8 @@ double AudioEngine::GenerateVoice(KeyData^ data, int vocieNr) {
 
     double sample = AudioEngine::Wave(params->SawAmount, time, params->Pow);
 
-    generatorAggregate = params->FmMod ? generatorAggregate * 1.5 * sample : generatorAggregate + sample / params->ActiveGenerators->Count;
+    generatorAggregate = params->FmMod ? (generatorAggregate * 1.5 * sample) 
+                                       : (generatorAggregate + sample / params->ActiveGenerators->Count);
   }
 
   return generatorAggregate;

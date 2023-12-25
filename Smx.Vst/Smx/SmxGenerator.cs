@@ -3,6 +3,7 @@ using Smx.Vst.Collections;
 using Smx.Vst.Data;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace Smx.Vst.Smx
 
 
     private AudioEngine nativeEngine;
-    private EngineParameter nativeParameter;
+    private EngineParameter engineParameter;
     private long processedSamples = 0;
     private long runtimeTicks = 0;
     private Stopwatch sw = new Stopwatch();
@@ -36,51 +37,30 @@ namespace Smx.Vst.Smx
     {
       this.parameters = parameters.SmxParameters;
 
-
-      nativeParameter = new EngineParameter();
-      nativeEngine = new AudioEngine(nativeParameter);
+      engineParameter = this.parameters.GeneralParameter.EngineParameter;
+      nativeEngine = new AudioEngine(engineParameter);
       
-      foreach (var filterParameter in this.parameters.FilterParameterAry)
+      foreach (var container in this.parameters.FilterManagerAry)
       {
-        nativeParameter.ActiveFilter.Add(new Filter(filterParameter));
+        engineParameter.ActiveFilter.Add(new Filter(container.FilterParamer));
       }
 
     }
 
-    public bool IsPlaying => this.keys.Any() || this.nativeParameter.ActiveKeys.Any();
+    public bool IsPlaying => this.keys.Any() || this.engineParameter.ActiveKeys.Any();
 
     internal void Generate(float sampleRate, VstAudioBuffer[] outChannels)
     {
       sw.Restart();
-      nativeParameter.FilterCount = (int)parameters.FilterCountMgr.CurrentValue;
-      nativeParameter.SampleRate = sampleRate;
-      nativeParameter.Attack = parameters.AttackMgr.CurrentValue;
-      nativeParameter.FmMod = parameters.FmModMgr.CurrentValue == 1;
-      nativeParameter.InitialDetune = parameters.IniDetMgr.CurrentValue;
-      nativeParameter.InitialDetuneAcceleration = parameters.InTuAcMgr.CurrentValue;
-      nativeParameter.InitialDetuneFriction = parameters.InTuFrMgr.CurrentValue;
-      nativeParameter.Tune = parameters.TuneMgr.CurrentValue;
-      nativeParameter.Pow = parameters.PowMgr.CurrentValue;
-      nativeParameter.VoiceCount = (int)parameters.VoiceCountMgr.CurrentValue;
-      nativeParameter.VoiceSpread = parameters.VoiceSpreadMgr.CurrentValue;
-      nativeParameter.VoiceDetune = parameters.VoiceDetuneMgr.CurrentValue;
-      nativeParameter.UniDetune = parameters.UniDetMgr.CurrentValue;
-      nativeParameter.UniPan = parameters.UniPanMgr.CurrentValue;
-      nativeParameter.SawAmount = parameters.SawMgr.CurrentValue;
-      nativeParameter.ActiveGenerators = GeneratorList.List.Where(g => parameters.GenMgrs[g.Index].CurrentValue == 1)
-                                        .OfType<GeneratorParameter>()
-                                        .ToList();
-      nativeParameter.MinGenFactor = (float)nativeParameter.ActiveGenerators.Min(g => g.Factor);
 
-      //nativeParameter.ActiveFilter = parameters.FilterParameterAry
-      //  .Take((int)parameters.FilterCountMgr.CurrentValue)
-      //  .Select(container => new FilterParameter()
-      //  {
-      //    Cutoff = container.CutoffMgr.CurrentValue,
-      //    Resonance = container.ResonanceMgr.CurrentValue,
-      //    WetAmt = container.DryWetMgr.CurrentValue,
-      //    Mode = (int)container.ModeMgrs.CurrentValue
-      //  }).ToList();
+      engineParameter.SampleRate = sampleRate;
+      engineParameter.ActiveGenerators = GeneratorList.List.Where(g => parameters.GenParameterContainer[g.Index].CurrentValue == 1)
+                                  .OfType<GeneratorParameter>()
+                                  .ToList();
+      engineParameter.MinGenFactor = engineParameter.ActiveGenerators.Any() ? 
+         (float)engineParameter.ActiveGenerators.Min(g => g.Factor)
+         : 0.0f;
+
 
       int length = outChannels[0].SampleCount;
       unsafe
