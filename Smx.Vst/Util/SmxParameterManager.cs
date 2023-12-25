@@ -8,6 +8,8 @@ namespace Smx.Vst.Util
   {
     private VstParameterManager innerManager;
     private Action<float>? updateAction;
+    internal bool IsInteger = false;
+    internal bool IsSwitch = false;
 
     public SmxParameterManager(VstParameterInfo paramInfo, Action<float>? updateAction = null, float min = 0, float max = 1)
     {

@@ -41,7 +41,7 @@ namespace Smx.Vst.UI
     {
       this.viewModel.IsPressed = true;
       this.mouseStart = Mouse.GetPosition(this);
-      this.valueStart = this.viewModel.Value;
+      this.valueStart = this.viewModel.NormalizedValue;
       Mouse.Capture(this);
     }
 
@@ -50,7 +50,8 @@ namespace Smx.Vst.UI
       if (this.viewModel.IsPressed)
       {
         double mouseDelta = Mouse.GetPosition(this).Y - this.mouseStart.Y;
-        this.viewModel.Value = Math.Clamp(valueStart - mouseDelta / 100.0, 0.0, 1.0);
+        var value = Math.Clamp(valueStart - mouseDelta / 100.0, 0.0, 1.0);
+        this.viewModel.NormalizedValue = value;
         this.UpdateGeometry();
       }
     }
@@ -73,7 +74,7 @@ namespace Smx.Vst.UI
       if (this.viewModel == null)
         return;
 
-      double rad = Math.PI * 2.0 * Math.Clamp(this.viewModel.Value, 0.001,0.999);
+      double rad = Math.PI * 2.0 * Math.Clamp(this.viewModel.NormalizedValue, 0.001,0.999);
 
       double radius = OuterEllipse.ActualWidth / 2.0;
 
@@ -88,12 +89,13 @@ namespace Smx.Vst.UI
         ctx.ArcTo(new Point(-Math.Sin(rad) * radius, Math.Cos(rad) * radius),
           new Size(radius, radius),
           rotationAngle: 0,
-          isLargeArc: this.viewModel.Value > 0.5f,
+          isLargeArc: this.viewModel.NormalizedValue > 0.5f,
           sweepDirection: SweepDirection.Clockwise,
           isStroked: true,
           isSmoothJoin: false
           );
       }
+
       geometry.Freeze();
       myPath.Data = geometry;
     }

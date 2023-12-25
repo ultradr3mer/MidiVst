@@ -69,7 +69,7 @@ namespace Smx.Vst.Data
             label: "Voice Count",
             shortLabel: "Voi.Cou.",
             min: 1,
-            max: 16,
+            max: 8,
             defaultValue: 1,
             updateAction: v => EngineParameter.VoiceCount = v);
 

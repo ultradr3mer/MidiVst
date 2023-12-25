@@ -54,6 +54,7 @@ namespace Smx.Vst.Data
 
       Action<float>? intUpdateAction = updateAction != null ? f => updateAction((int)f) : null;
       var smxManager = new SmxParameterManager(paramInfo, intUpdateAction, min, max);
+      smxManager.IsInteger = true;
       this.Add(smxManager);
       return smxManager;
     }
@@ -73,6 +74,7 @@ namespace Smx.Vst.Data
 
       Action<float>? boolUpdateAction = updateAction != null ? f => updateAction(f == 1) : null;
       var smxManager = new SmxParameterManager(paramInfo, boolUpdateAction);
+      smxManager.IsSwitch = true;
       this.Add(smxManager);
       return smxManager;
     }
