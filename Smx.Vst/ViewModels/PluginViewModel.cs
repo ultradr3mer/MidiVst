@@ -11,6 +11,7 @@ namespace Smx.Vst.ViewModels
   {
     public BindingList<KnobViewModel> GeneralKnobs { get; set; } = new BindingList<KnobViewModel>();
     public BindingList<KnobViewModel> GeneratorKnobs { get; set; } = new BindingList<KnobViewModel>();
+    public BindingList<FilterViewModel> FilterKnobs { get; set; } = new BindingList<FilterViewModel>();
 
     internal void InitializeParameters(PluginParameters parameters)
     {
@@ -22,6 +23,12 @@ namespace Smx.Vst.ViewModels
       foreach (var item in parameters.SmxParameters.GenParameterContainer)
       {
         GeneratorKnobs.Add(new KnobViewModel(item));
+      }
+
+      int filterNr = 0;
+      foreach (var item in parameters.SmxParameters.FilterManagerAry)
+      {
+        FilterKnobs.Add(new FilterViewModel(item, filterNr++));
       }
     }
   }

@@ -1,4 +1,5 @@
 ﻿using Smx.Vst.Util;
+using Smx.Vst.ViewModels;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,50 +9,58 @@ using System.Windows.Shapes;
 
 namespace Smx.Vst.UI
 {
-  /// <summary>
-  /// Interaction logic for RotaryDail.xaml
-  /// </summary>
-  public partial class RotaryDail : UserControl
+    /// <summary>
+    /// Interaction logic for RotaryDail.xaml
+    /// </summary>
+    public partial class RotaryDail : UserControl
   {
-    private double fill = 0.6;
-    private double fillStart;
+    private double valueStart;
     private Point mouseStart;
     private DailViewModel viewModel;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public RotaryDail()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
       InitializeComponent();
-      this.viewModel = new DailViewModel();
-      this.DataContext = this.viewModel;
 
-      this.MouseDown += Button_MouseDown;
-      this.MouseUp += Button_MouseUp;
-      this.MouseMove += Button_MouseMove;
+      this.MouseDown += Dail_MouseDown;
+      this.MouseUp += Dail_MouseUp;
+      this.MouseMove += Dail_MouseMove;
+
+      this.DataContextChanged += RotaryDail_DataContextChanged;
     }
 
+    private void RotaryDail_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+      this.viewModel = (DailViewModel)e.NewValue;
+      this.UpdateGeometry();
+    }
 
-    private void Button_MouseDown(object sender, MouseButtonEventArgs e)
+    private void Dail_MouseDown(object sender, MouseButtonEventArgs e)
     {
       this.viewModel.IsPressed = true;
       this.mouseStart = Mouse.GetPosition(this);
-      this.fillStart = this.fill;
+      this.valueStart = this.viewModel.Value;
+      Mouse.Capture(this);
     }
 
-    private void Button_MouseMove(object sender, MouseEventArgs e)
+    private void Dail_MouseMove(object sender, MouseEventArgs e)
     {
       if (this.viewModel.IsPressed)
       {
         double mouseDelta = Mouse.GetPosition(this).Y - this.mouseStart.Y;
-        this.fill = Math.Clamp(fillStart - mouseDelta / 100.0, 0.0, 1.0);
+        this.viewModel.Value = Math.Clamp(valueStart - mouseDelta / 100.0, 0.0, 1.0);
         this.UpdateGeometry();
       }
     }
 
-    private void Button_MouseUp(object sender, MouseButtonEventArgs e)
+    private void Dail_MouseUp(object sender, MouseButtonEventArgs e)
     {
       this.viewModel.IsPressed = false;
       this.mouseStart = new Point(0, 0);
-      this.fillStart = 0;
+      this.valueStart = 0;
+      Mouse.Captured?.ReleaseMouseCapture();
     }
 
     private void Path_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -61,7 +70,10 @@ namespace Smx.Vst.UI
 
     private void UpdateGeometry()
     {
-      double rad = Math.PI * 2.0 * Math.Clamp(fill, 0.001,0.999);
+      if (this.viewModel == null)
+        return;
+
+      double rad = Math.PI * 2.0 * Math.Clamp(this.viewModel.Value, 0.001,0.999);
 
       double radius = OuterEllipse.ActualWidth / 2.0;
 
@@ -76,7 +88,7 @@ namespace Smx.Vst.UI
         ctx.ArcTo(new Point(-Math.Sin(rad) * radius, Math.Cos(rad) * radius),
           new Size(radius, radius),
           rotationAngle: 0,
-          isLargeArc: fill > 0.5f,
+          isLargeArc: this.viewModel.Value > 0.5f,
           sweepDirection: SweepDirection.Clockwise,
           isStroked: true,
           isSmoothJoin: false
@@ -84,11 +96,6 @@ namespace Smx.Vst.UI
       }
       geometry.Freeze();
       myPath.Data = geometry;
-    }
-
-    private void UserControl_MouseUp(object sender, MouseButtonEventArgs e)
-    {
-
     }
   }
 }

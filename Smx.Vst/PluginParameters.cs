@@ -25,8 +25,9 @@ namespace VstNetAudioPlugin
     private void Plugin_Opened(object? sender, System.EventArgs e)
     {
       var plugin = (VstPlugin?)sender;
-
-      var hostAutomation = plugin?.Host?.GetInstance<IVstHostAutomation>();
+      var host = plugin?.Host;
+      var cpbltys = host?.Capabilities;
+      var hostAutomation = host?.GetInstance<IVstHostAutomation>();
       SetHostAutomation(hostAutomation);
     }
 

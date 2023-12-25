@@ -6,26 +6,10 @@
              xmlns:local="clr-namespace:Smx.Vst.UI"
              xmlns:mah ="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="450">
+             d:DesignHeight="70" d:DesignWidth="70">
   <UserControl.Resources>
     <ResourceDictionary Source="/Smx.Vst;component/UI/StyleDictionary.xaml" />
   </UserControl.Resources>
-  <!--<UserControl.Style>
-    <Style TargetType="UserControl">-->
-  <!--<Style.Triggers>
-        <Trigger Property="IsMouseOver" Value="True">
-          <Setter Property="Effect" Value="{StaticResource MahApps.Brushes.Button.Border.Focus}" />
-          <Setter Property="Fill" Value="{StaticResource MahApps.Brushes.Button.Flat.Background.Pressed}" />
-          <Setter Property="StrokeThickness" Value="2.0" />
-        </Trigger>-->
-  <!--<Trigger Property="{Binding IsPressed}" Value="True">
-      <Setter Property="Stroke" Value="{StaticResource MahApps.Brushes.Button.Border.Focus}" />
-      <Setter Property="Fill" Value="{StaticResource MahApps.Brushes.Button.Flat.Background.MouseOver}" />
-      <Setter Property="StrokeThickness" Value="2.0" />
-    </Trigger>-->
-  <!--</Style.Triggers>
-    </Style>
-  </UserControl.Style>-->
   <Grid x:Name="MainGrid">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="1*" />
@@ -43,9 +27,13 @@
       <RowDefinition Height="2*" />
       <RowDefinition Height="1*" />
     </Grid.RowDefinitions>
-
-    <Ellipse x:Name="OuterEllipse" Fill="{StaticResource MahApps.Brushes.Gray.SemiTransparent}"
-             Stroke="{StaticResource MahApps.Brushes.SubMenu.Border}" Grid.Row="1" Grid.Column="1" Grid.RowSpan="4" Grid.ColumnSpan="4" />
+    <Ellipse x:Name="OuterEllipse" 
+             Fill="{StaticResource MahApps.Brushes.Gray.SemiTransparent}"
+             Stroke="{StaticResource MahApps.Brushes.SubMenu.Border}" Grid.Row="1" Grid.Column="1" Grid.RowSpan="4" Grid.ColumnSpan="4" >
+      <Ellipse.Effect>
+        <DropShadowEffect BlurRadius="16" Direction="-80" ShadowDepth="8" Opacity="0.5"/>
+      </Ellipse.Effect>
+    </Ellipse>
     <Path x:Name="FillState"
           Fill="{StaticResource MahApps.Brushes.Accent}"
           Stroke="{StaticResource MahApps.Brushes.Button.Border}"
@@ -61,7 +49,7 @@
           <Style.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},Path=IsMouseOver}" Value="True">
               <Setter Property="Stroke" Value="{StaticResource MahApps.Brushes.Button.Border.Focus}" />
-              <!--<Setter Property="Fill" Value="{StaticResource MahApps.Brushes.Button.Flat.Background.Pressed}" />-->
+              <Setter Property="Fill" Value="{StaticResource MahApps.Brushes.Button.Flat.Background.Pressed}" />
               <Setter Property="StrokeThickness" Value="2.0" />
             </DataTrigger>
             <DataTrigger Binding="{Binding IsPressed}" Value="True">
@@ -72,6 +60,17 @@
           </Style.Triggers>
         </Style>
       </Ellipse.Style>
+      <Ellipse.Effect>
+        <DropShadowEffect BlurRadius="16" Direction="-80" ShadowDepth="8" Opacity="0.5"/>
+      </Ellipse.Effect>
     </Ellipse>
+    <Label Grid.Row="2" 
+           Grid.Column="2" 
+           Grid.RowSpan="2" 
+           Grid.ColumnSpan="2" 
+           VerticalAlignment="Center" 
+           HorizontalAlignment="Center" 
+           Content="{Binding ValueString}">
+    </Label>
   </Grid>
 </UserControl>

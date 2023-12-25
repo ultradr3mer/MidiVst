@@ -118,13 +118,8 @@ void AudioEngine::Run(HashSet<short>^ currentKeys, int length, array<float*>^ ou
   {
     float sample = GenerateSample(currentKeys);
 
-    int filterCount = params->FilterCount;
-    int filterIndex = 0;
     for each(Filter^ filter in params->ActiveFilter) 
     {
-      if (filterIndex++ > filterCount)
-        break;
-
       sample = filter->Process(sample);
     }
 

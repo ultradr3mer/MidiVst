@@ -15,12 +15,6 @@ namespace Smx.Vst.Smx
   /// </summary>
   internal sealed class SmxParameters
   {
-    public const string AttackParameterName = "Attack";
-    public const string FmModParameterName = "FmMod";
-    public const string PowParameterName = "Pow";
-    public const string ReleaseParameterName = "Release";
-    public const string SawParameterName = "Saw";
-    private const string ParameterCategoryName = "Smx";
 
     /// <summary>
     /// Initializes the paramaters for the Delay component.
@@ -41,17 +35,19 @@ namespace Smx.Vst.Smx
     {
       VstParameterInfoCollection parameterInfos = parameters.ParameterInfos;
 
-      VstParameterCategory paramCategory =
-          parameters.GetParameterCategory(ParameterCategoryName);
+      VstParameterCategory paramCategory = parameters.GetParameterCategory("General");
 
       this.GeneralParameter = new GeneralParameterContainer(paramCategory);
       parameterInfos.AddRange(this.GeneralParameter.ParameterInfos);
+
+      paramCategory = parameters.GetParameterCategory("Filter");
 
       FilterManagerAry = Enumerable.Range(0, AudioEngine.MaxFilter)
                                     .Select(i => new FilterParameterContainer(paramCategory, i))
                                     .ToArray();
       parameterInfos.AddRange(this.FilterManagerAry.SelectMany(m => m.ParameterInfos));
 
+      paramCategory = parameters.GetParameterCategory("Oscillators");
 
       this.GenParameterContainer = new GenParameterContainer(paramCategory);
       parameterInfos.AddRange(this.GenParameterContainer.ParameterInfos);

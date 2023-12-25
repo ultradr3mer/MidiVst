@@ -5,15 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Smx.Vst.UI"
              mc:Ignorable="d" 
-             Height="450" Width="800">
+             Height="450" Width="950">
   <UserControl.Resources>
     <ResourceDictionary Source="/Smx.Vst;component/UI/StyleDictionary.xaml"/>
   </UserControl.Resources>
   <Grid Background="{StaticResource MahApps.Brushes.Control.Background}">
     <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="2*"/>
+      <ColumnDefinition Width="3*"/>
+      <ColumnDefinition Width="2.5*"/>
     </Grid.ColumnDefinitions>
     <ListBox x:Name="listBox" ItemsSource="{Binding GeneratorKnobs}" d:ItemsSource="{d:SampleData ItemCount=5}" >
       <ListBox.ItemTemplate>
@@ -22,13 +22,22 @@
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
-    <ListBox x:Name="listBox1" ItemsSource="{Binding GeneralKnobs}" Grid.Column="1" d:ItemsSource="{d:SampleData ItemCount=5}" >
+    <ListBox  ItemsSource="{Binding GeneralKnobs}" Grid.Column="1" d:ItemsSource="{d:SampleData ItemCount=5}" >
       <ListBox.ItemTemplate>
         <DataTemplate >
           <local:ParameterKnob HorizontalAlignment="Stretch"/>
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
-    <local:RotaryDail Grid.Column="2" Width="100" Height="100" />
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="2" >
+      <ItemsControl ItemsSource="{Binding FilterKnobs}" 
+              d:ItemsSource="{d:SampleData ItemCount=5}" >
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <local:FilterEditorView Margin="2"/>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
   </Grid>
 </UserControl>

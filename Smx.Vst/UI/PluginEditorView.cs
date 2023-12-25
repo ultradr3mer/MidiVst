@@ -25,8 +25,8 @@ namespace VstNetAudioPlugin.UI
 
       using (var g = this.CreateGraphics())
       {
-        this.Height = (int)(350 * g.DpiX / 96);
-        this.Width = (int)(650 * g.DpiY / 96);
+        this.Height = (int)(400 * g.DpiX / 96);
+        this.Width = (int)(900 * g.DpiY / 96);
       }
 
       this.Controls.Add(host);

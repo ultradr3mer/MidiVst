@@ -82,19 +82,10 @@ namespace Smx.Vst.Data
             label: "Voice Spread",
             shortLabel: "Voi.Spr.",
             updateAction: v => EngineParameter.VoiceSpread = v);
-
-      FilterCountMgr = CreateInteger(name: "FltrCt",
-                  label: "Filter Count",
-                  shortLabel: "Fil.Cnt.",
-                  min: 0,
-                  max: 4,
-                  defaultValue: (int)FilterMode.None,
-                  updateAction: v => EngineParameter.FilterCount = v);
     }
 
     public SmxParameterManager AttackMgr { get; private set; }
     public EngineParameter EngineParameter { get; }
-    public SmxParameterManager FilterCountMgr { get; private set; }
     public SmxParameterManager FmModMgr { get; private set; }
     public SmxParameterManager IniDetMgr { get; private set; }
     public SmxParameterManager InTuAcMgr { get; private set; }

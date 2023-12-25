@@ -47,12 +47,6 @@
     <ClCompile Include="AudioEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EngineParameter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="KeyData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Filter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

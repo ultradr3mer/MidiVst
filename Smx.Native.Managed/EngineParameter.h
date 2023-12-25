@@ -9,7 +9,6 @@ using namespace System::Collections::Generic;
 public ref class EngineParameter
 {
 public:
-  int FilterCount;
   bool FmMod;
   float Attack;
   float Release;
