@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="Smx.Vst.UI.RotaryDail"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Smx.Vst.UI"
+             xmlns:mah ="http://metro.mahapps.com/winfx/xaml/controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="450" >
+  <UserControl.Resources>
+    <ResourceDictionary Source="/Smx.Vst;component/UI/StyleDictionary.xaml"/>
+  </UserControl.Resources>
+  <Grid x:Name="MainGrid" MouseDown="MainGrid_MouseDown">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="1*"/>
+      <ColumnDefinition Width="2*"/>
+      <ColumnDefinition Width="4*"/>
+      <ColumnDefinition Width="4*"/>
+      <ColumnDefinition Width="2*"/>
+      <ColumnDefinition Width="1*"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="1*"/>
+      <RowDefinition Height="2*"/>
+      <RowDefinition Height="4*"/>
+      <RowDefinition Height="4*"/>
+      <RowDefinition Height="2*"/>
+      <RowDefinition Height="1*"/>
+    </Grid.RowDefinitions>
+    <Ellipse x:Name="OuterEllipse" Fill="{StaticResource MahApps.Brushes.Gray.SemiTransparent}"
+             Stroke="{StaticResource MahApps.Brushes.SubMenu.Border}" Grid.Row="1" Grid.Column="1" Grid.RowSpan="4" Grid.ColumnSpan="4"/>
+    <Path Initialized="UserControl_Initialized" x:Name="FillState" 
+          Fill="{StaticResource MahApps.Brushes.Accent}"
+          Stroke="{StaticResource MahApps.Brushes.Button.Border}"
+          Data="M0,0 L0,-100 A100,100 0 0 1 70.7,-70.7 z" 
+          Grid.Row="3" Grid.Column="3" Grid.RowSpan="3" Grid.ColumnSpan="3" 
+          SizeChanged="Path_SizeChanged" />
+    <Button Template="{StaticResource RotaryDailCenterButton}" Grid.Row="2" Grid.Column="2"  Grid.RowSpan="2" Grid.ColumnSpan="2" >
+
+    </Button>
+    
+    <!--<Ellipse Fill="Black" Grid.Row="1" Grid.Column="1" Grid.RowSpan="3" Grid.ColumnSpan="3">
+      <Ellipse.Clip>
+        <PathGeometry FillRule="EvenOdd">
+          <PathGeometry.Figures>
+            <PathFigureCollection>
+              <PathFigure IsClosed="True" StartPoint="225,225">
+                <PathFigure.Segments>
+                  <PathSegmentCollection>
+                    <LineSegment Point="0,0" />
+                    <LineSegment Point="450,0" />
+                  </PathSegmentCollection>
+                </PathFigure.Segments>
+              </PathFigure>
+            </PathFigureCollection>
+          </PathGeometry.Figures>
+        </PathGeometry>
+      </Ellipse.Clip>
+    </Ellipse>-->
+  </Grid>
+</UserControl>

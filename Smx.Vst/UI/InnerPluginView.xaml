@@ -9,8 +9,9 @@
   <UserControl.Resources>
     <ResourceDictionary Source="/Smx.Vst;component/UI/StyleDictionary.xaml"/>
   </UserControl.Resources>
-  <Grid>
+  <Grid Background="{StaticResource MahApps.Brushes.Control.Background}">
     <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*"/>
       <ColumnDefinition Width="*"/>
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
@@ -28,6 +29,6 @@
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
-
+    <local:RotaryDail Grid.Column="2" Width="100" Height="100" />
   </Grid>
 </UserControl>
