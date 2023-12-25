@@ -16,7 +16,7 @@ namespace Smx.Vst.Data
       this.paramCategory = paramCategory;
     }
 
-    protected SmxParameterManager CreateFloat(string name, string label, string shortLabel, float defaultValue = 0, Action<float> updateAction = null, float min = 0, float max = 0)
+    protected SmxParameterManager CreateFloat(string name, string label, string shortLabel, float defaultValue = 0, Action<float> updateAction = null, float min = 0, float max = 1)
     {
       var paramInfo = new VstParameterInfo
       {

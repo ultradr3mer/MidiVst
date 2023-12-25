@@ -23,8 +23,8 @@ namespace Smx.Vst.ViewModels
     public Visibility CheckboxVisibility { get; }
     public Visibility SliderVisibility { get; }
     public bool IsValue { get => Value == 1; set => Value = value ? 1 : 0; }
-    public int MinValue { get; private set; }
-    public int MaxValue { get; private set; }
+    public double MinValue { get; private set; }
+    public double MaxValue { get; private set; }
     public bool IsInteger { get; private set; }
     public double StepSize { get; private set; }
 
@@ -45,8 +45,6 @@ namespace Smx.Vst.ViewModels
     {
       if (parameterInfo.IsSwitch)
       {
-        this.MinValue = 0;
-        this.MaxValue = 1;
         this.IsInteger = false;
         return;
       }
@@ -62,16 +60,8 @@ namespace Smx.Vst.ViewModels
         this.StepSize = parameterInfo.StepFloat;
       }
 
-      if (parameterInfo.IsMinMaxIntegerValid)
-      {
-        this.MinValue = parameterInfo.MinInteger;
-        this.MaxValue = parameterInfo.MaxInteger;
-      }
-      else 
-      {
-        this.MinValue = 0;
-        this.MaxValue = 1;
-      }
+      this.MaxValue = mgr.Max;
+      this.MinValue = mgr.Min;
     }
 
     private void KnobViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
