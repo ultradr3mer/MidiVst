@@ -114,9 +114,19 @@ void AudioEngine::UpdateKeys(HashSet<short>^ currentKeys)
 void AudioEngine::Run(HashSet<short>^ currentKeys, int length, array<float*>^ outBuffer)
 {
   int channelCount = outBuffer->Length;
-  for (int i = 0; i < length; i++)
+  for (int sampleIndex = 0; sampleIndex < length; sampleIndex++)
   {
     float sample = GenerateSample(currentKeys);
+
+    int filterCount = params->FilterCount;
+    int filterIndex = 0;
+    for each(Filter^ filter in params->ActiveFilter) 
+    {
+      if (filterIndex++ > filterCount)
+        break;
+
+      sample = filter->Process(sample);
+    }
 
     for (int channelIndex = 0; channelIndex < channelCount; channelIndex++)
     {

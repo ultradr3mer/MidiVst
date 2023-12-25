@@ -2,7 +2,7 @@
 
 namespace Smx.Vst.Util
 {
-  internal class AudioMath
+  internal static class AudioMath
   {
     internal static double Clamp(double value, double min, double max)
     {

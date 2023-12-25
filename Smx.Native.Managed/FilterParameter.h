@@ -1,7 +1,8 @@
+#pragma once
 public ref class FilterParameter {
 public:
-  double Mode;
+  int Mode;
   double Cutoff;
-  double DryWet;
+  double WetAmt;
   double Resonance;
 };

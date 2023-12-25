@@ -2,6 +2,7 @@
 #include "FilterParameter.h"
 #include "GeneratorParameter.h"
 #include "KeyData.h"
+#include "Filter.h"
 
 using namespace System::Collections::Generic;
 
@@ -28,11 +29,11 @@ public:
 
   EngineParameter() {
     ActiveKeys = gcnew Dictionary<short, KeyData^>();
-    ActiveFilter = gcnew List<FilterParameter^>();
+    ActiveFilter = gcnew List<Filter^>();
     ActiveGenerators = gcnew List<GeneratorParameter^>();
   };
 
-  List<FilterParameter^>^ ActiveFilter;
+  List<Filter^>^ ActiveFilter;
   List<GeneratorParameter^>^ ActiveGenerators;
   Dictionary<short, KeyData^>^ ActiveKeys;
 };

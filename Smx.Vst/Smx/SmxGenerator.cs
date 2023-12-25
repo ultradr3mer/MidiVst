@@ -24,7 +24,6 @@ namespace Smx.Vst.Smx
     //private Dictionary<short, KeyData> keyDataDict = new Dictionary<short, KeyData>();
     private HashSet<short> keys = new HashSet<short>();
 
-    //private List<Filter> filterList = new List<Filter>();
 
     private AudioEngine nativeEngine;
     private EngineParameter nativeParameter;
@@ -37,13 +36,15 @@ namespace Smx.Vst.Smx
     {
       this.parameters = parameters.SmxParameters;
 
-      //foreach (var filterParameter in this.parameters.FilterParameterAry)
-      //{
-      //  filterList.Add(new Filter(filterParameter));
-      //}
 
       nativeParameter = new EngineParameter();
       nativeEngine = new AudioEngine(nativeParameter);
+      
+      foreach (var filterParameter in this.parameters.FilterParameterAry)
+      {
+        nativeParameter.ActiveFilter.Add(new Filter(filterParameter));
+      }
+
     }
 
     public bool IsPlaying => this.keys.Any() || this.nativeParameter.ActiveKeys.Any();
@@ -51,7 +52,7 @@ namespace Smx.Vst.Smx
     internal void Generate(float sampleRate, VstAudioBuffer[] outChannels)
     {
       sw.Restart();
-      //nativeParameter.FilterCount = (int)parameters.FilterCountMgr.CurrentValue;
+      nativeParameter.FilterCount = (int)parameters.FilterCountMgr.CurrentValue;
       nativeParameter.SampleRate = sampleRate;
       nativeParameter.Attack = parameters.AttackMgr.CurrentValue;
       nativeParameter.FmMod = parameters.FmModMgr.CurrentValue == 1;
@@ -70,6 +71,16 @@ namespace Smx.Vst.Smx
                                         .OfType<GeneratorParameter>()
                                         .ToList();
       nativeParameter.MinGenFactor = (float)nativeParameter.ActiveGenerators.Min(g => g.Factor);
+
+      //nativeParameter.ActiveFilter = parameters.FilterParameterAry
+      //  .Take((int)parameters.FilterCountMgr.CurrentValue)
+      //  .Select(container => new FilterParameter()
+      //  {
+      //    Cutoff = container.CutoffMgr.CurrentValue,
+      //    Resonance = container.ResonanceMgr.CurrentValue,
+      //    WetAmt = container.DryWetMgr.CurrentValue,
+      //    Mode = (int)container.ModeMgrs.CurrentValue
+      //  }).ToList();
 
       int length = outChannels[0].SampleCount;
       unsafe
@@ -105,67 +116,6 @@ namespace Smx.Vst.Smx
     internal void ProcessNoteOnEvent(byte v)
     {
       keys.Add(v);
-    }
-
-    private double GenerateNote(KeyData data)
-    {
-      var voiceCount = (int)parameters.VoiceCountMgr.CurrentValue;
-
-      var noteSample = Enumerable.Range(0, voiceCount).Sum(v => this.nativeEngine.GenerateVoice(data, v));
-
-      return noteSample;
-    }
-
-    private double GenerateVoice(byte key, KeyData data, List<GeneratorList.GeneratorItem> gens, int v)
-    {
-      var shiftPerVoice = parameters.VoiceSpreadMgr.CurrentValue
-                      / noteFrequencies[key]
-                      / gens.Min(o => o.Factor);
-      var voiceTime = data.Time
-                * (1.0 + v / 10.0 * parameters.VoiceDetuneMgr.CurrentValue)
-                + shiftPerVoice * v;
-
-      int shiftNr = 0;
-      double CalcTime(GeneratorParameter genPara)
-      {
-        return voiceTime * noteFrequencies[key] * 4.0 * parameters.TuneMgr.CurrentValue * genPara.Factor
-               * (1.0 + shiftNr / 100.0 * parameters.UniDetMgr.CurrentValue)
-               + parameters.UniPanMgr.CurrentValue * shiftNr++ / gens.Count();
-      }
-
-      return (data.Actuation * ((parameters.FmModMgr.CurrentValue == 1)
-                      ? gens.Aggregate(1.0, (a, g) => a * 1.5 * AudioEngine.Wave(parameters.SawMgr.CurrentValue, CalcTime(g), parameters.PowMgr.CurrentValue))
-                      : gens.Sum(g => AudioEngine.Wave(parameters.SawMgr.CurrentValue, CalcTime(g), parameters.PowMgr.CurrentValue))));
-    }
-
-    private double Wave(double saw, double t)
-    {
-      t = t % 1;
-      double segment13_length = (1.0 - saw) / 4.0;
-      double segment2_length = (1.0 + saw) / 2.0;
-
-      if (t < segment13_length)
-      {
-        t = t / (1 - saw);
-      }
-      else if (t < segment13_length + segment2_length)
-      {
-        t = (t - segment13_length) / (1.0 + saw) + 1.0 / 4.0;
-      }
-      else
-      {
-        t = 1 - (1 - t) / (1 - saw);
-      }
-
-      double sin_wave = Math.Sin(2 * Math.PI * t);
-
-      double saw_wave = t < 1.0 / 4.0 ? t * 4.0 :
-        t < 3.0 / 4.0 ? 1 - (t - 1.0 / 4.0) * 4.0 :
-        -4.0 + 4.0 * t;
-
-      double combined = (1 - saw) * sin_wave + saw * saw_wave;
-
-      return Math.Pow(Math.Abs(combined), parameters.PowMgr.CurrentValue) * Math.Sign(combined);
     }
   }
 }

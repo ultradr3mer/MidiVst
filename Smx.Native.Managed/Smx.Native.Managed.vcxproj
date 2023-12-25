@@ -114,6 +114,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AudioEngine.h" />
+    <ClInclude Include="AudioMath.h" />
+    <ClInclude Include="Filter.h" />
+    <ClInclude Include="FilterMode.h" />
     <ClInclude Include="FilterParameter.h" />
     <ClInclude Include="GeneratorParameter.h" />
     <ClInclude Include="KeyData.h" />
@@ -123,6 +126,7 @@
   <ItemGroup>
     <ClCompile Include="AudioEngine.cpp" />
     <ClCompile Include="EngineParameter.cpp" />
+    <ClCompile Include="Filter.cpp" />
     <ClCompile Include="KeyData.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
