@@ -20,6 +20,11 @@ namespace Smx.Vst.UI
   /// </summary>
   public partial class RotaryDail : UserControl
   {
+    private bool isPressed;
+    private Point mouseStart;
+    private double fillStart;
+    double fill = 0.6;
+
     public RotaryDail()
     {
       InitializeComponent();
@@ -27,7 +32,11 @@ namespace Smx.Vst.UI
 
     private void Path_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-      double fill = 0.6;
+      this.UpdateGeometry();
+    }
+
+    private void UpdateGeometry()
+    {
       double rad = Math.PI * 2.0 * fill;
 
       double radius = OuterEllipse.ActualWidth / 2.0;
@@ -61,6 +70,35 @@ namespace Smx.Vst.UI
     private void MainGrid_MouseDown(object sender, MouseButtonEventArgs e)
     {
 
+    }
+
+    private void Button_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+      this.isPressed = true;
+      this.mouseStart = Mouse.GetPosition(this);
+      this.fillStart = this.fill;
+    }
+
+    private void Button_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+      this.isPressed = false;
+      this.mouseStart = new Point(0, 0);
+      this.fillStart = 0;
+    }
+
+    private void Button_MouseMove(object sender, MouseEventArgs e)
+    {
+      if (this.isPressed)
+      {
+        double mouseDelta = Mouse.GetPosition(this).Y - this.mouseStart.Y;
+        this.fill = fillStart - mouseDelta / 100.0;
+        this.UpdateGeometry();
+      }
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+  
     }
   }
 }

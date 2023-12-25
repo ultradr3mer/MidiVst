@@ -35,8 +35,14 @@
           Data="M0,0 L0,-100 A100,100 0 0 1 70.7,-70.7 z" 
           Grid.Row="3" Grid.Column="3" Grid.RowSpan="3" Grid.ColumnSpan="3" 
           SizeChanged="Path_SizeChanged" />
-    <Button Template="{StaticResource RotaryDailCenterButton}" Grid.Row="2" Grid.Column="2"  Grid.RowSpan="2" Grid.ColumnSpan="2" >
-
+    <Button IsEnabled="False" Template="{StaticResource RotaryDailCenterButton}" 
+            Grid.Row="2" 
+            Grid.Column="2"  
+            Grid.RowSpan="2" 
+            Grid.ColumnSpan="2" 
+            PreviewMouseDown="Button_Click"
+            PreviewMouseUp="Button_MouseUp"
+            MouseMove="Button_MouseMove">
     </Button>
     
     <!--<Ellipse Fill="Black" Grid.Row="1" Grid.Column="1" Grid.RowSpan="3" Grid.ColumnSpan="3">
