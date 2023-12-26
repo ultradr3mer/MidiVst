@@ -33,7 +33,7 @@ namespace Smx.Vst
       services.AddSingleton<PluginParameters>()
                 .AddSingletonAll<PluginPrograms>()
                 .AddSingleton<VstMidiProgram>()
-                .AddSingleton<Smx.SmxGenerator>()
+                .AddSingleton<Smx.NativeEngineHost>()
                 .AddSingletonAll<AudioProcessor>()
                 .AddSingletonAll<MidiProcessor>()
                 .AddSingletonAll<PluginEditor>();

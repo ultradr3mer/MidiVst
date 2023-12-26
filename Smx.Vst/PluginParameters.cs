@@ -1,15 +1,15 @@
 ﻿using Jacobi.Vst.Core.Plugin;
 using Jacobi.Vst.Plugin.Framework;
 using Jacobi.Vst.Plugin.Framework.Plugin;
-using Smx.Vst.Smx;
+using Smx.Vst.Parameter;
 using System.Linq;
 
 namespace VstNetAudioPlugin
 {
-  /// <summary>
-  /// A central location for all plugin parameters
-  /// </summary>
-  internal sealed class PluginParameters
+    /// <summary>
+    /// A central location for all plugin parameters
+    /// </summary>
+    internal sealed class PluginParameters
   {
     /// <summary>
     /// Initializes all plugin parameters (one component at a time).
@@ -26,7 +26,6 @@ namespace VstNetAudioPlugin
     {
       var plugin = (VstPlugin?)sender;
       var host = plugin?.Host;
-      var cpbltys = host?.Capabilities;
       var hostAutomation = host?.GetInstance<IVstHostAutomation>();
       SetHostAutomation(hostAutomation);
     }

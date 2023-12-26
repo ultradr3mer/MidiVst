@@ -1,34 +1,57 @@
-﻿using Jacobi.Vst.Plugin.Framework;
-using Smx.Vst.Data;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using VstNetAudioPlugin;
 
 namespace Smx.Vst.ViewModels
 {
   internal class PluginViewModel
   {
-    public BindingList<KnobViewModel> GeneratorKnobs { get; set; } = new BindingList<KnobViewModel>();
-    public BindingList<DailViewModel> GeneralKnobs { get; set; } = new BindingList<DailViewModel>();
-    public BindingList<FilterViewModel> FilterKnobs { get; set; } = new BindingList<FilterViewModel>();
+    public BindingList<KnobViewModel> GeneratorVms { get; set; } = new BindingList<KnobViewModel>();
+    public BindingList<DailViewModel> GeneralVms { get; set; } = new BindingList<DailViewModel>();
+    public BindingList<FilterViewModel> FilterVms { get; set; } = new BindingList<FilterViewModel>();
+    public BindingList<EnvelopeLinkViewModel> UnasignedEnvelopeLinkVms { get; set; } = new BindingList<EnvelopeLinkViewModel>();
+    public BindingList<EnvelopeViewModel> EnvelopeVms { get; set; } = new BindingList<EnvelopeViewModel>();
 
     internal void InitializeParameters(PluginParameters parameters)
     {
       foreach (var item in parameters.SmxParameters.GenParameterContainer)
       {
-        GeneratorKnobs.Add(new KnobViewModel(item));
+        GeneratorVms.Add(new KnobViewModel(item));
       }
 
       foreach (var item in parameters.SmxParameters.GeneralParameter)
       {
-        GeneralKnobs.Add(new DailViewModel(item));
+        GeneralVms.Add(new DailViewModel(item));
       }
 
       int filterNr = 0;
       foreach (var item in parameters.SmxParameters.FilterManagerAry)
       {
-        FilterKnobs.Add(new FilterViewModel(item, filterNr++));
+        FilterVms.Add(new FilterViewModel(item, filterNr++));
+      }
+
+      int envNr = 0;
+      foreach (var item in parameters.SmxParameters.EnvelopeManagerAry)
+      {
+        EnvelopeVms.Add(new EnvelopeViewModel(item, parameters.SmxParameters.ModParaManager, UnasignedEnvelopeLinkVms, envNr++));
+      }
+
+      int linkNr = 0;
+      foreach (var item in parameters.SmxParameters.EnvelopeLinkManagerAry)
+      {
+        var vm = new EnvelopeLinkViewModel(item, linkNr++);
+        int linkEnvNr = item.Parameter.EnvelopeNr;
+
+        if (linkEnvNr == -1) {
+          UnasignedEnvelopeLinkVms.Add(vm);
+          return;
+        }
+
+        int targetId = item.Parameter.EnvelopeNr;
+
+        var paraMgr = parameters.SmxParameters.ModParaManager[targetId];
+        vm.Link(linkEnvNr, targetId, paraMgr.ParameterInfo.Label, paraMgr.ParameterInfo.ShortLabel);
+        var envVm = EnvelopeVms[linkEnvNr];
+        envVm.EnvelopeLinkViewModels.Add(vm);
       }
     }
   }

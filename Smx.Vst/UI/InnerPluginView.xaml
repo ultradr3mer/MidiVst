@@ -5,17 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Smx.Vst.UI"
              mc:Ignorable="d" 
-             Height="450" Width="950">
+             Height="450" Width="950"           
+             Foreground="{DynamicResource MahApps.Brushes.SystemControlPageTextBaseMedium}">
   <UserControl.Resources>
-    <ResourceDictionary Source="/Smx.Vst;component/UI/StyleDictionary.xaml"/>
+    <ResourceDictionary Source="/Smx.Vst;component/UI/StyleDictionary.xaml" />
   </UserControl.Resources>
   <Grid Background="{StaticResource MahApps.Brushes.Control.Background}">
     <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="2*"/>
+      <ColumnDefinition Width="1.5*"/>
       <ColumnDefinition Width="3*"/>
-      <ColumnDefinition Width="2.5*"/>
+      <ColumnDefinition Width="3*"/>
     </Grid.ColumnDefinitions>
-    <ListBox x:Name="listBox" ItemsSource="{Binding GeneratorKnobs}" d:ItemsSource="{d:SampleData ItemCount=5}" >
+    <ListBox x:Name="listBox" ItemsSource="{Binding GeneratorVms}" d:ItemsSource="{d:SampleData ItemCount=5}" >
       <ListBox.ItemTemplate>
         <DataTemplate >
           <CheckBox Content="{Binding Label}" IsChecked="{Binding IsValue}" HorizontalAlignment="Left"/>
@@ -23,7 +24,7 @@
       </ListBox.ItemTemplate>
     </ListBox>
     <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="1" >
-      <ItemsControl ItemsSource="{Binding GeneralKnobs}" d:ItemsSource="{d:SampleData ItemCount=5}" >
+      <ItemsControl ItemsSource="{Binding GeneralVms}" d:ItemsSource="{d:SampleData ItemCount=5}" >
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
             <WrapPanel />
@@ -37,14 +38,24 @@
       </ItemsControl>
     </ScrollViewer>
     <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="2" >
-      <ItemsControl ItemsSource="{Binding FilterKnobs}" 
-              d:ItemsSource="{d:SampleData ItemCount=5}" >
-        <ItemsControl.ItemTemplate>
-          <DataTemplate>
-            <local:FilterEditorView Margin="2"/>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+      <StackPanel>
+        <Label FontSize="16" Foreground="{DynamicResource MahApps.Brushes.SystemControlPageTextBaseMedium}" Content="Envelopes" />
+        <ItemsControl ItemsSource="{Binding EnvelopeVms}" d:ItemsSource="{d:SampleData ItemCount=5}" >
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <local:EnvelopeEditorView HorizontalAlignment="Stretch" Margin="2"/>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Label FontSize="16" Foreground="{DynamicResource MahApps.Brushes.SystemControlPageTextBaseMedium}" Content="Filters" />
+        <ItemsControl ItemsSource="{Binding FilterVms}" d:ItemsSource="{d:SampleData ItemCount=5}" >
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <local:FilterEditorView HorizontalAlignment="Stretch" Margin="2"/>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
     </ScrollViewer>
   </Grid>
 </UserControl>

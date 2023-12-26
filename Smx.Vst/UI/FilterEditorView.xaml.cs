@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Smx.Vst.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Smx.Vst.UI
 {
@@ -20,9 +9,34 @@ namespace Smx.Vst.UI
   /// </summary>
   public partial class FilterEditorView : UserControl
   {
+    private FilterViewModel viewModel;
+
     public FilterEditorView()
     {
       InitializeComponent();
+
+      this.DataContextChanged += FilterEditorView_DataContextChanged;
+    }
+
+    private void FilterEditorView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+      this.viewModel = (FilterViewModel)e.NewValue;
+      this.viewModel.PropertyChanged += ViewModel_PropertyChanged;
+      ExpandCollapse();
+    }
+
+    private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(FilterViewModel.SelectedMode))
+      {
+        this.ExpandCollapse();
+      }
+    }
+
+    private void ExpandCollapse()
+    {
+      var mode = this.viewModel.SelectedMode?.Mode;
+      this.Height = (mode == FilterMode.None) ? 40 : 130;
     }
   }
 }

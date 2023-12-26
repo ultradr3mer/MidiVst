@@ -6,10 +6,10 @@ namespace Smx.Vst.Util
 {
   internal class SmxParameterManager : INotifyPropertyChanged
   {
-    private VstParameterManager innerManager;
-    private Action<float>? updateAction;
     internal bool IsInteger = false;
     internal bool IsSwitch = false;
+    private VstParameterManager innerManager;
+    private Action<float>? updateAction;
 
     public SmxParameterManager(VstParameterInfo paramInfo, Action<float>? updateAction = null, float min = 0, float max = 1)
     {
@@ -32,9 +32,9 @@ namespace Smx.Vst.Util
       get => this.innerManager.CurrentValue;
       set
       {
-        if(value == CurrentValue) 
+        if (value == CurrentValue)
           return;
-        
+
         if (this.innerManager.ActiveParameter != null)
         {
           this.innerManager.ActiveParameter.Value = (float)value;
@@ -42,10 +42,11 @@ namespace Smx.Vst.Util
       }
     }
 
-    public VstParameterInfo ParameterInfo { get => this.innerManager.ParameterInfo; }
-
-    public float Min { get; }
     public float Max { get; }
+    public float Min { get; }
+    public ModPara ModPara { get; internal set; }
+    public VstParameterInfo ParameterInfo { get => this.innerManager.ParameterInfo; }
+    public int ModParaIndex { get; internal set; }
 
     private void InnerManager_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {

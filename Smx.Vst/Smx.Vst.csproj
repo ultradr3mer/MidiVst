@@ -35,6 +35,10 @@
     <Folder Include="Extensions\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="copy /y &quot;$(TargetDir)Smx.Native.Managed.dll&quot; &quot;$(TargetDir)deploy\Smx.Native.Managed.dll&quot;&#xD;&#xA;copy /y &quot;$(TargetDir)Smx.Native.Managed.pdb&quot; &quot;$(TargetDir)deploy\Smx.Native.Managed.pdb&quot;" />
   </Target>

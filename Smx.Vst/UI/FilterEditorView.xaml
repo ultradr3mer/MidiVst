@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Smx.Vst.UI"
              mc:Ignorable="d"
-             d:DesignHeight="130" d:DesignWidth="250"
+             Height="130" d:DesignWidth="250"
              Foreground="{DynamicResource MahApps.Brushes.SystemControlPageTextBaseMedium}">
   <UserControl.Resources>
     <ResourceDictionary Source="/Smx.Vst;component/UI/StyleDictionary.xaml"/>
@@ -16,7 +16,7 @@
     <Grid Margin="4">
       <Grid.RowDefinitions>
         <RowDefinition Height="30" />
-        <RowDefinition Height="*" />
+        <RowDefinition Height="20" />
         <RowDefinition Height="70" />
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>

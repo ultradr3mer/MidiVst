@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Documents;
 
-namespace Smx.Vst.Data
+namespace Smx.Vst.Parameter
 {
   internal class ParameterContainer : List<SmxParameterManager>
   {
@@ -14,6 +14,28 @@ namespace Smx.Vst.Data
     public ParameterContainer(VstParameterCategory paramCategory)
     {
       this.paramCategory = paramCategory;
+    }
+
+    protected SmxParameterManager CreateFloatMod(string name, string label, string shortLabel, ModPara modPara, float defaultValue = 0, float min = 0, float max = 1)
+    {
+      var paramInfo = new VstParameterInfo
+      {
+        Category = paramCategory,
+        CanBeAutomated = true,
+        Name = name,
+        Label = label,
+        ShortLabel = shortLabel,
+        LargeStepFloat = 0.1f,
+        SmallStepFloat = 0.01f,
+        StepFloat = 0.05f,
+        DefaultValue = defaultValue,
+      };
+
+      Action<float>? updateAction = v => modPara.SetBase(v);
+      var smxManager = new SmxParameterManager(paramInfo, updateAction, min, max);
+      smxManager.ModPara = modPara;
+      Add(smxManager);
+      return smxManager;
     }
 
     protected SmxParameterManager CreateFloat(string name, string label, string shortLabel, float defaultValue = 0, Action<float> updateAction = null, float min = 0, float max = 1)
@@ -32,7 +54,7 @@ namespace Smx.Vst.Data
       };
 
       var smxManager = new SmxParameterManager(paramInfo, updateAction, min, max);
-      this.Add(smxManager);
+      Add(smxManager);
       return smxManager;
     }
 
@@ -55,7 +77,7 @@ namespace Smx.Vst.Data
       Action<float>? intUpdateAction = updateAction != null ? f => updateAction((int)f) : null;
       var smxManager = new SmxParameterManager(paramInfo, intUpdateAction, min, max);
       smxManager.IsInteger = true;
-      this.Add(smxManager);
+      Add(smxManager);
       return smxManager;
     }
 
@@ -75,10 +97,8 @@ namespace Smx.Vst.Data
       Action<float>? boolUpdateAction = updateAction != null ? f => updateAction(f == 1) : null;
       var smxManager = new SmxParameterManager(paramInfo, boolUpdateAction);
       smxManager.IsSwitch = true;
-      this.Add(smxManager);
+      Add(smxManager);
       return smxManager;
     }
-
-    public IEnumerable<VstParameterInfo> ParameterInfos { get => this.Select(p => p.ParameterInfo); }
   }
 }

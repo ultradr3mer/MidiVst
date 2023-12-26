@@ -1,4 +1,4 @@
-﻿using Smx.Vst.Data;
+﻿using Smx.Vst.Parameter;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Smx.Vst.ViewModels
 {
-  internal class FilterViewModel : INotifyPropertyChanged
+    internal class FilterViewModel : INotifyPropertyChanged
   {
     private FilterParameterContainer parameterContainer;
 

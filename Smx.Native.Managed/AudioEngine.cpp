@@ -176,7 +176,7 @@ double AudioEngine::GenerateVoice(KeyData^ data, int vocieNr) {
       * (1.0 + shiftNr / 100.0 * params->UniDetune)
       + params->UniPan * shiftNr++ / params->ActiveGenerators->Count;
 
-    double sample = AudioEngine::Wave(params->SawAmount, time, params->Pow);
+    double sample = AudioEngine::Wave(params->SawAmount->Get(), time, params->Pow);
 
     generatorAggregate = params->FmMod ? (generatorAggregate * 1.5 * sample) 
                                        : (generatorAggregate + sample / params->ActiveGenerators->Count);

@@ -43,9 +43,6 @@ namespace Smx.Vst.Data
     {
       public string DisplayName { get; set; }
       public string ParameterName { get; set; }
-      //public double Factor { get; set; }
-      //public int Mult { get; set; }
-      //public int Index { get; set; }
       public string ParameterLabel { get; internal set; }
 
       public override string ToString()

@@ -42,6 +42,15 @@
     <ClInclude Include="FilterMode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EnvelopeParameter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnvelopeLinkParameter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModPara.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioEngine.cpp">

@@ -5,17 +5,17 @@
     using System;
 
     /// <summary>
-    /// Implements the audio processing of the plugin using the <see cref="Smx.SmxGenerator"/>.
+    /// Implements the audio processing of the plugin using the <see cref="Smx.NativeEngineHost"/>.
     /// </summary>
     internal sealed class AudioProcessor : VstPluginAudioProcessor
   {
-    private readonly Smx.SmxGenerator generator;
+    private readonly Smx.NativeEngineHost generator;
 
     /// <summary>
     /// Constructs a new instance.
     /// </summary>
     /// <param name="plugin">Must not be null.</param>
-    public AudioProcessor(Smx.SmxGenerator generator)
+    public AudioProcessor(Smx.NativeEngineHost generator)
         : base(2, 2, 0, noSoundInStop: true)
     {
       this.generator = generator ?? throw new ArgumentNullException(nameof(generator));

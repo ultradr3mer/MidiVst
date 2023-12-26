@@ -115,6 +115,9 @@
   <ItemGroup>
     <ClInclude Include="AudioEngine.h" />
     <ClInclude Include="AudioMath.h" />
+    <ClInclude Include="ModPara.h" />
+    <ClInclude Include="EnvelopeLinkParameter.h" />
+    <ClInclude Include="EnvelopeParameter.h" />
     <ClInclude Include="Filter.h" />
     <ClInclude Include="FilterMode.h" />
     <ClInclude Include="FilterParameter.h" />

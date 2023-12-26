@@ -33,12 +33,15 @@ namespace Smx.Vst.UI
 
     private void RotaryDail_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-      this.viewModel = (DailViewModel)e.NewValue;
+      this.viewModel = e.NewValue as DailViewModel;
       this.UpdateGeometry();
     }
 
     private void Dail_MouseDown(object sender, MouseButtonEventArgs e)
     {
+      if (this.viewModel == null)
+        return;
+
       this.viewModel.IsPressed = true;
       this.mouseStart = Mouse.GetPosition(this);
       this.valueStart = this.viewModel.NormalizedValue;
@@ -47,7 +50,10 @@ namespace Smx.Vst.UI
 
     private void Dail_MouseMove(object sender, MouseEventArgs e)
     {
-      if (this.viewModel.IsPressed)
+      if(this.viewModel == null) 
+        return;
+
+      if (this.viewModel.IsPressed == true)
       {
         double mouseDelta = Mouse.GetPosition(this).Y - this.mouseStart.Y;
         var value = Math.Clamp(valueStart - mouseDelta / 100.0, 0.0, 1.0);
@@ -58,6 +64,9 @@ namespace Smx.Vst.UI
 
     private void Dail_MouseUp(object sender, MouseButtonEventArgs e)
     {
+      if (this.viewModel == null)
+        return;
+
       this.viewModel.IsPressed = false;
       this.mouseStart = new Point(0, 0);
       this.valueStart = 0;

@@ -14,6 +14,8 @@ public:
 
   void Run(HashSet<short>^ currentKeys, int length, array<float*>^ outBuffer);
   static int MaxFilter = 4;
+  static int MaxEnvelopes = 4;
+  static int MaxEnvelopeLinks = 12;
 private:
   Dictionary<int, float>^ InitializeNoteFrequencies();
   Dictionary<int, float>^ noteFrequencies;

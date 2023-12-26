@@ -12,13 +12,13 @@
   /// </summary>
   internal sealed class MidiProcessor : IVstMidiProcessor
   {
-    private readonly Smx.SmxGenerator generator;
+    private readonly Smx.NativeEngineHost generator;
 
     /// <summary>
     /// Constructs a new instance.
     /// </summary>
     /// <param name="plugin"></param>
-    public MidiProcessor(Smx.SmxGenerator generator)
+    public MidiProcessor(Smx.NativeEngineHost generator)
     {
       this.generator = generator ?? throw new ArgumentNullException(nameof(generator));
     }
