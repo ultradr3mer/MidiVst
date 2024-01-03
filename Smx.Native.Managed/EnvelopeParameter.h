@@ -10,10 +10,10 @@ public:
     Links = gcnew List<EnvelopeLinkParameter^>();
   };
 
-  double Attack;
-  double Decay;
-  double Sustain;
-  double Release;
+  double Attack = 0.01;
+  double Decay = 0.5;
+  double Sustain = 0.1;
+  double Release = 1.0;
 
   List<EnvelopeLinkParameter^>^ Links;
 };

@@ -10,7 +10,7 @@ public:
   {
     base = value;
   }
-  void SetMod(float value)
+  void SetEnv(float value)
   {
     mod = value;
   }

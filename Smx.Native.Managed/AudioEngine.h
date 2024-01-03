@@ -16,6 +16,9 @@ public:
   static int MaxFilter = 4;
   static int MaxEnvelopes = 4;
   static int MaxEnvelopeLinks = 12;
+  inline bool GetHasActiveKeys() {
+    return this->ActiveKeys->Count >= 0;
+  };
 private:
   Dictionary<int, float>^ InitializeNoteFrequencies();
   Dictionary<int, float>^ noteFrequencies;
@@ -23,7 +26,8 @@ private:
   static double Wave(double saw, double t, double pow);
   void UpdateKeys(HashSet<short>^ currentKeys);
   double GenerateSample(HashSet<short>^ currentKeys);
-  double GenerateKeys();
+  double GenerateKeys(HashSet<short>^ currentKeys);
   double GenerateKey(KeyData^ data);
   double GenerateVoice(KeyData^ data, int voiceNr);
+  Dictionary<short, KeyData^>^ ActiveKeys;
 };

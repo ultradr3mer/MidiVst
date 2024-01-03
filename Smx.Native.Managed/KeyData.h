@@ -1,6 +1,7 @@
 #pragma once
+#include "Envelope.h"
 
-public ref class KeyData
+ref class KeyData
 {
   public:
     double Actuation;
@@ -8,4 +9,5 @@ public ref class KeyData
     double DetuneVec;
     double Time;
     double KeyFrequency;
+    List<Envelope^>^ ActiveEnvelopes;
 };

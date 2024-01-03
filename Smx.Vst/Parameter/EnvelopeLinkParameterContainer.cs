@@ -14,7 +14,9 @@ namespace Smx.Vst.Parameter
       AmmountMgr = CreateFloat(name: "LinkAm" + letter,
                               label: "Link Ammount " + letter,
                               shortLabel: "Lnk.Am." + letter,
-                              updateAction: v => Parameter.Ammount = v);
+                              updateAction: v => Parameter.Ammount = v,
+                              min: -1,
+                              max: 1);
       EnvelopeMgr = CreateInteger(name: "LinkEn" + letter,
                              label: "Link Envelope " + letter,
                              shortLabel: "Lnk.En." + letter,

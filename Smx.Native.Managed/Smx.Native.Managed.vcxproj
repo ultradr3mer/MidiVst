@@ -115,6 +115,8 @@
   <ItemGroup>
     <ClInclude Include="AudioEngine.h" />
     <ClInclude Include="AudioMath.h" />
+    <ClInclude Include="Envelope.h" />
+    <ClInclude Include="EnvelopeStage.h" />
     <ClInclude Include="ModPara.h" />
     <ClInclude Include="EnvelopeLinkParameter.h" />
     <ClInclude Include="EnvelopeParameter.h" />
@@ -128,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioEngine.cpp" />
+    <ClCompile Include="Envelope.cpp" />
     <ClCompile Include="Filter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

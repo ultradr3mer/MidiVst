@@ -20,13 +20,15 @@ namespace Smx.Vst.ViewModels
     public string? LabelLong { get; private set; }
     public string? LabelShort { get; private set; }
 
-    public void Link(int envelopeId, int targetId, string? labelLong, string? labelShort)
+    public EnvelopeLinkParameter Link(int envelopeId, int targetId, string? labelLong, string? labelShort)
     {
       this.item.EnvelopeMgr.CurrentValue = envelopeId;
       this.item.TargetIdMgr.CurrentValue = targetId;
       this.item.AmmountMgr.CurrentValue = 0.5f;
       this.LabelLong = labelLong;
       this.LabelShort = labelShort;
+
+      return this.item.Parameter;
     }
   }
 }

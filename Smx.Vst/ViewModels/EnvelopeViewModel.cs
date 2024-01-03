@@ -1,12 +1,8 @@
-﻿using Microsoft.Xaml.Behaviors.Core;
-using Smx.Vst.Parameter;
+﻿using Smx.Vst.Parameter;
 using Smx.Vst.Util;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Smx.Vst.ViewModels
@@ -19,7 +15,8 @@ namespace Smx.Vst.ViewModels
     };
 
     private readonly int i;
-
+    private readonly EnvelopeParameterContainer item;
+    private readonly Dictionary<int, SmxParameterManager> modManagers;
     private readonly BindingList<EnvelopeLinkViewModel> unasignedEnvelopeLinkVms;
 
     public EnvelopeViewModel(EnvelopeParameterContainer item, Dictionary<int, SmxParameterManager> modManagers, BindingList<EnvelopeLinkViewModel> unasignedEnvelopeLinkVms, int i)
@@ -40,6 +37,8 @@ namespace Smx.Vst.ViewModels
       this.SelectedEnvelopeLink = DefaultItem;
 
       this.EnvelopeName = $"Env#{i}";
+      this.item = item;
+      this.modManagers = modManagers;
       this.unasignedEnvelopeLinkVms = unasignedEnvelopeLinkVms;
       this.AddLinkCommand = new DelegateCommand(AddLinkCommandExecute, AddLinkCommandCanExecute);
 
@@ -68,6 +67,14 @@ namespace Smx.Vst.ViewModels
 
     public DailViewModel SustainVm { get; }
 
+    public void Link(EnvelopeLinkViewModel vm, int targetId, string? labelLong, string? labelShort)
+    {
+      var linkParams = vm.Link(this.i, targetId, labelLong, labelShort);
+      linkParams.TargetModPara = modManagers[targetId].ModPara;
+      this.EnvelopeLinkViewModels.Add(vm);
+      this.item.Parameter.Links.Add(linkParams);
+    }
+
     private bool AddLinkCommandCanExecute(object arg)
     {
       return this.SelectedEnvelopeLink != null &&
@@ -81,8 +88,7 @@ namespace Smx.Vst.ViewModels
 
       var vm = unasignedEnvelopeLinkVms.First();
       var selectedLink = this.SelectedEnvelopeLink;
-      vm.Link(this.i, selectedLink.TargetId, selectedLink.LabelLong, selectedLink.LabelShort);
-      this.EnvelopeLinkViewModels.Add(vm);
+      Link(vm, selectedLink.TargetId, selectedLink.LabelLong, selectedLink.LabelShort);
     }
 
     private void EnvelopeViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)

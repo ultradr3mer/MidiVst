@@ -51,12 +51,21 @@
     <ClInclude Include="ModPara.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Envelope.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnvelopeStage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Filter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Envelope.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

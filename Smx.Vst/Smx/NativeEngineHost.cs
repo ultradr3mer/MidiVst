@@ -32,9 +32,11 @@ namespace Smx.Vst.Smx
       {
         engineParameter.ActiveFilter.Add(new Filter(container.FilterParamer));
       }
+
+      engineParameter.ActiveEnvelopes = this.parameters.EnvelopeManagerAry.Select(m => m.Parameter).ToList();
     }
 
-    public bool IsPlaying => this.keys.Any() || this.engineParameter.ActiveKeys.Any();
+    public bool IsPlaying => this.keys.Any() || this.nativeEngine.GetHasActiveKeys();
 
     internal void Generate(float sampleRate, VstAudioBuffer[] outChannels)
     {

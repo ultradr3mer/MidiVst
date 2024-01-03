@@ -30,7 +30,6 @@ public:
   float SampleRate;
 
   EngineParameter() {
-    ActiveKeys = gcnew Dictionary<short, KeyData^>();
     ActiveFilter = gcnew List<Filter^>();
     ActiveGenerators = gcnew List<GeneratorParameter^>();
     SawAmount = gcnew ModPara();
@@ -39,6 +38,5 @@ public:
   List<Filter^>^ ActiveFilter;
   List<EnvelopeParameter^>^ ActiveEnvelopes;
   List<GeneratorParameter^>^ ActiveGenerators;
-  Dictionary<short, KeyData^>^ ActiveKeys;
 };
 

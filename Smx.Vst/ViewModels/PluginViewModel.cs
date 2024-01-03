@@ -47,11 +47,9 @@ namespace Smx.Vst.ViewModels
         }
 
         int targetId = item.Parameter.EnvelopeNr;
-
         var paraMgr = parameters.SmxParameters.ModParaManager[targetId];
-        vm.Link(linkEnvNr, targetId, paraMgr.ParameterInfo.Label, paraMgr.ParameterInfo.ShortLabel);
         var envVm = EnvelopeVms[linkEnvNr];
-        envVm.EnvelopeLinkViewModels.Add(vm);
+        envVm.Link(vm, targetId, paraMgr.ParameterInfo.Label, paraMgr.ParameterInfo.ShortLabel);
       }
     }
   }
