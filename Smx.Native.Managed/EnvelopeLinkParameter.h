@@ -3,7 +3,7 @@
 
 public ref class EnvelopeLinkParameter {
 public:
-  double Ammount;
+  double Ammount = 0;
   int EnvelopeNr;
   int TargetId;
 

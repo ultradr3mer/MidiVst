@@ -43,7 +43,7 @@ namespace Smx.Vst.ViewModels
 
         if (linkEnvNr == -1) {
           UnasignedEnvelopeLinkVms.Add(vm);
-          return;
+          continue;
         }
 
         int targetId = item.Parameter.EnvelopeNr;

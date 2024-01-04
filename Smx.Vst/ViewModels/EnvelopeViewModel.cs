@@ -87,6 +87,7 @@ namespace Smx.Vst.ViewModels
         return;
 
       var vm = unasignedEnvelopeLinkVms.First();
+      unasignedEnvelopeLinkVms.Remove(vm);
       var selectedLink = this.SelectedEnvelopeLink;
       Link(vm, selectedLink.TargetId, selectedLink.LabelLong, selectedLink.LabelShort);
     }

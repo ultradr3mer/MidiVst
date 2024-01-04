@@ -1,11 +1,11 @@
 #include "Envelope.h"
 
 double Envelope::nextSample() {
-  if (currentStage != ENVELOPE_STAGE_OFF &&
-    currentStage != ENVELOPE_STAGE_SUSTAIN) {
+  if (currentStage != EnvelopeStage::ENVELOPE_STAGE_OFF &&
+    currentStage != EnvelopeStage::ENVELOPE_STAGE_SUSTAIN) {
     if (currentSampleIndex >= nextStageSampleIndex) {
       EnvelopeStage newStage = static_cast<EnvelopeStage>(
-        (currentStage + 1) % kNumEnvelopeStages
+        ((int)currentStage + 1) % (int)EnvelopeStage::kNumEnvelopeStages
         );
       enterStage(newStage);
     }
@@ -17,21 +17,21 @@ double Envelope::nextSample() {
 
 bool Envelope::Step(bool released)
 {
-  bool result = currentStage != ENVELOPE_STAGE_OFF;
+  bool result = currentStage != EnvelopeStage::ENVELOPE_STAGE_OFF;
 
-  bool isReleasing = currentStage == ENVELOPE_STAGE_RELEASE
-                    || currentStage == ENVELOPE_STAGE_OFF;
+  bool isReleasing = currentStage == EnvelopeStage::ENVELOPE_STAGE_RELEASE
+                    || currentStage == EnvelopeStage::ENVELOPE_STAGE_OFF;
 
   if (released 
     && !isReleasing)
   {
-    this->enterStage(ENVELOPE_STAGE_RELEASE);
+    this->enterStage(EnvelopeStage::ENVELOPE_STAGE_RELEASE);
   }
   else if (!released 
     && isReleasing)
   {
     attackMinimumLevel = fmin(currentLevel, minimumLevel);
-    this->enterStage(ENVELOPE_STAGE_ATTACK);
+    this->enterStage(EnvelopeStage::ENVELOPE_STAGE_ATTACK);
   }
 
   double sample = this->nextSample();
@@ -55,13 +55,13 @@ double Envelope::getStageValue(EnvelopeStage stage)
 {
   switch (stage)
   {
-  case ENVELOPE_STAGE_ATTACK:
+  case EnvelopeStage::ENVELOPE_STAGE_ATTACK:
     return parameters->Attack;
-  case ENVELOPE_STAGE_DECAY:
+  case EnvelopeStage::ENVELOPE_STAGE_DECAY:
     return parameters->Decay;
-  case ENVELOPE_STAGE_SUSTAIN:
+  case EnvelopeStage::ENVELOPE_STAGE_SUSTAIN:
     return parameters->Sustain;
-  case ENVELOPE_STAGE_RELEASE:
+  case EnvelopeStage::ENVELOPE_STAGE_RELEASE:
     return parameters->Release;
   default:
     return 0.0;
@@ -72,35 +72,35 @@ double Envelope::getStageValue(EnvelopeStage stage)
 void Envelope::enterStage(EnvelopeStage newStage) {
   currentStage = newStage;
   currentSampleIndex = 0;
-  if (currentStage == ENVELOPE_STAGE_OFF ||
-    currentStage == ENVELOPE_STAGE_SUSTAIN) {
+  if (currentStage == EnvelopeStage::ENVELOPE_STAGE_OFF ||
+    currentStage == EnvelopeStage::ENVELOPE_STAGE_SUSTAIN) {
     nextStageSampleIndex = 0;
   }
   else {
     nextStageSampleIndex = getStageValue(currentStage) * sampleRate;
   }
   switch (newStage) {
-  case ENVELOPE_STAGE_OFF:
+  case EnvelopeStage::ENVELOPE_STAGE_OFF:
     currentLevel = 0.0;
     multiplier = 1.0;
     break;
-  case ENVELOPE_STAGE_ATTACK:
+  case EnvelopeStage::ENVELOPE_STAGE_ATTACK:
     currentLevel = attackMinimumLevel;
     calculateMultiplier(currentLevel,
       1.0,
       nextStageSampleIndex);
     break;
-  case ENVELOPE_STAGE_DECAY:
+  case EnvelopeStage::ENVELOPE_STAGE_DECAY:
     currentLevel = 1.0;
     calculateMultiplier(currentLevel,
-      fmax(getStageValue(ENVELOPE_STAGE_SUSTAIN), minimumLevel),
+      fmax(getStageValue(EnvelopeStage::ENVELOPE_STAGE_SUSTAIN), minimumLevel),
       nextStageSampleIndex);
     break;
-  case ENVELOPE_STAGE_SUSTAIN:
-    currentLevel = getStageValue(ENVELOPE_STAGE_SUSTAIN);
+  case EnvelopeStage::ENVELOPE_STAGE_SUSTAIN:
+    currentLevel = fmax(getStageValue(EnvelopeStage::ENVELOPE_STAGE_SUSTAIN), minimumLevel);
     multiplier = 1.0;
     break;
-  case ENVELOPE_STAGE_RELEASE:
+  case EnvelopeStage::ENVELOPE_STAGE_RELEASE:
     // We could go from ATTACK/DECAY to RELEASE,
     // so we're not changing currentLevel here.
     calculateMultiplier(currentLevel,

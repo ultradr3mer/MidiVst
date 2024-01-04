@@ -12,14 +12,14 @@ public:
   Envelope(EnvelopeParameter^ paras, double sampleRate) :
     minimumLevel(0.0001),
     attackMinimumLevel(0.0001),
-    currentStage(ENVELOPE_STAGE_OFF),
+    currentStage(EnvelopeStage::ENVELOPE_STAGE_OFF),
     currentLevel(minimumLevel),
     multiplier(1.0),
     sampleRate(sampleRate),
     currentSampleIndex(0),
     nextStageSampleIndex(0),
     parameters(paras) {
-    enterStage(ENVELOPE_STAGE_ATTACK);
+    enterStage(EnvelopeStage::ENVELOPE_STAGE_ATTACK);
   };
 private:
   double minimumLevel;

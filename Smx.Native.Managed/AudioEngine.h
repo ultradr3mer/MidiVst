@@ -12,7 +12,7 @@ public:
   AudioEngine(EngineParameter^ params);
   ~AudioEngine(); 
 
-  void Run(HashSet<short>^ currentKeys, int length, array<float*>^ outBuffer);
+  void Run(Dictionary<short, int>^ currentKeys, int length, array<float*>^ outBuffer);
   static int MaxFilter = 4;
   static int MaxEnvelopes = 4;
   static int MaxEnvelopeLinks = 12;
@@ -24,11 +24,11 @@ private:
   Dictionary<int, float>^ noteFrequencies;
   EngineParameter^ params;
   static double Wave(double saw, double t, double pow);
-  void UpdateKeys(HashSet<short>^ currentKeys);
-  double GenerateSample(HashSet<short>^ currentKeys);
-  double GenerateKeys(HashSet<short>^ currentKeys);
+  void UpdateKeys(Dictionary<short, int>^ currentKeys);
+  double GenerateSample(Dictionary<short, int>^ currentKeys);
+  double GenerateKeys(Dictionary<short, int>^ currentKeys);
   double GenerateKey(KeyData^ data);
   double GenerateVoice(KeyData^ data, int voiceNr);
-  Dictionary<short, KeyData^>^ activeKeys;
+  Dictionary<int, KeyData^>^ activeKeys;
   List<short>^ keysToRemove;
 };

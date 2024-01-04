@@ -26,7 +26,7 @@ public:
   float MinGenFactor;
 
   EngineParameter() {
-    ActiveFilter = gcnew List<Filter^>();
+    ActiveFilter = gcnew List<FilterParameter^>();
     ActiveGenerators = gcnew List<GeneratorParameter^>();
     AmpAmount = gcnew ModPara();
     SawAmount = gcnew ModPara();
@@ -38,7 +38,7 @@ public:
     VoiceDetune = gcnew ModPara();
   };
 
-  List<Filter^>^ ActiveFilter;
+  List<FilterParameter^>^ ActiveFilter;
   List<EnvelopeParameter^>^ ActiveEnvelopes;
   List<GeneratorParameter^>^ ActiveGenerators;
 };

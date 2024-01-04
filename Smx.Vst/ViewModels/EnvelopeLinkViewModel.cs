@@ -24,7 +24,7 @@ namespace Smx.Vst.ViewModels
     {
       this.item.EnvelopeMgr.CurrentValue = envelopeId;
       this.item.TargetIdMgr.CurrentValue = targetId;
-      this.item.AmmountMgr.CurrentValue = 0.5f;
+      this.AmountVm.Value = 0.5;
       this.LabelLong = labelLong;
       this.LabelShort = labelShort;
 

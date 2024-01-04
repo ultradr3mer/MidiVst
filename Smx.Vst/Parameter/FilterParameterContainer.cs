@@ -15,7 +15,7 @@ namespace Smx.Vst.Parameter
                                 min: (int)FilterMode.LowpassMix,
                                 max: (int)FilterMode.BandpassAdd,
                                 defaultValue: (int)FilterMode.None,
-                                updateAction: v => FilterParamer.Mode = v);
+                                updateAction: v => FilterParamer.Mode = (FilterMode)v);
       FltrCyclesMgr = CreateInteger(name: "FltrCy" + i,
                                 label: "Filter Cycles " + i,
                                 shortLabel: "Fil.Cy." + i,

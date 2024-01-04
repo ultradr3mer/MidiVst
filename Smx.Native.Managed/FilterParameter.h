@@ -1,9 +1,10 @@
 #pragma once
 #include "ModPara.h"
+#include "FilterMode.h"
 
 public ref class FilterParameter {
 public:
-  int Mode;
+  FilterMode Mode;
   int Cycles;
   ModPara^ Cutoff;
   ModPara^ WetAmt;

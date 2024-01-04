@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Forms;
 using VstNetAudioPlugin;
 
 namespace Smx.Vst.Smx
@@ -14,12 +15,13 @@ namespace Smx.Vst.Smx
     private readonly SmxParameters parameters;
 
     private EngineParameter engineParameter;
-    private HashSet<short> keys = new HashSet<short>();
+    private Dictionary<short,int> keys = new Dictionary<short,int>();
 
     private AudioEngine nativeEngine;
     private long processedSamples = 0;
     private long runtimeTicks = 0;
     private Stopwatch sw = new Stopwatch();
+    private int keyNumber;
 
     public NativeEngineHost(PluginParameters parameters)
     {
@@ -30,7 +32,7 @@ namespace Smx.Vst.Smx
 
       foreach (var container in this.parameters.FilterManagerAry)
       {
-        engineParameter.ActiveFilter.Add(new Filter(container.FilterParamer));
+        engineParameter.ActiveFilter.Add(container.FilterParamer);
       }
 
       engineParameter.ActiveEnvelopes = this.parameters.EnvelopeManagerAry.Select(m => m.Parameter).ToList();
@@ -40,7 +42,7 @@ namespace Smx.Vst.Smx
 
     internal void Generate(float sampleRate, VstAudioBuffer[] outChannels)
     {
-      sw.Restart();
+      //sw.Restart();
 
       engineParameter.SampleRate = sampleRate;
       engineParameter.ActiveGenerators = GeneratorList.List.Where(g => parameters.GenParameterContainer[g.Index].CurrentValue == 1)
@@ -63,17 +65,17 @@ namespace Smx.Vst.Smx
         nativeEngine.Run(keys, length, bufferAry);
       }
 
-      sw.Stop();
-      runtimeTicks += sw.ElapsedTicks;
-      processedSamples += length;
+      //sw.Stop();
+      //runtimeTicks += sw.ElapsedTicks;
+      //processedSamples += length;
 
-      if (processedSamples >= sampleRate)
-      {
-        var processedTicks = (long)(processedSamples * TimeSpan.TicksPerSecond / sampleRate);
-        Debug.WriteLine($"Runtime {runtimeTicks / processedTicks * 100:0.00}% {(float)runtimeTicks / (float)TimeSpan.TicksPerSecond}ms for {processedSamples} samples");
-        runtimeTicks = 0;
-        processedSamples = 0;
-      }
+      //if (processedSamples >= sampleRate)
+      //{
+      //  var processedTicks = (long)(processedSamples * TimeSpan.TicksPerSecond / sampleRate);
+      //  Debug.WriteLine($"Runtime {runtimeTicks / processedTicks * 100:0.00}% {(float)runtimeTicks / (float)TimeSpan.TicksPerSecond}ms for {processedSamples} samples");
+      //  runtimeTicks = 0;
+      //  processedSamples = 0;
+      //}
     }
 
     internal void ProcessNoteOffEvent(byte v)
@@ -83,7 +85,7 @@ namespace Smx.Vst.Smx
 
     internal void ProcessNoteOnEvent(byte v)
     {
-      keys.Add(v);
+      keys.Add(v,keyNumber++);
     }
   }
 }

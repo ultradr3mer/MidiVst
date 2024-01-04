@@ -1,5 +1,6 @@
 #pragma once
 #include "Envelope.h"
+#include "Filter.h"
 
 ref class KeyData
 {
@@ -7,4 +8,5 @@ ref class KeyData
     double Time;
     double KeyFrequency;
     List<Envelope^>^ ActiveEnvelopes;
+    List<Filter^>^ ActiveFilter;
 };

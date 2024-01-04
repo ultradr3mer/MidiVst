@@ -6,7 +6,7 @@ AudioEngine::AudioEngine(EngineParameter^ params)
 {
   this->params = params;
   this->noteFrequencies = InitializeNoteFrequencies();
-  this->activeKeys = gcnew Dictionary<short, KeyData^>();
+  this->activeKeys = gcnew Dictionary<int, KeyData^>();
   this->keysToRemove = gcnew List<short>();
 }
 
@@ -42,8 +42,46 @@ double AudioEngine::Wave(double saw, double t, double pow)
   return std::pow(std::abs(combined), pow) * std::copysign(1.0, combined);
 }
 
-void AudioEngine::UpdateKeys(HashSet<short>^ currentKeys)
+void AudioEngine::UpdateKeys(Dictionary<short, int>^ currentKeys)
 {
+  for each (auto item in currentKeys)
+  {
+    KeyData^ data;
+    if (!this->activeKeys->TryGetValue(item.Value, data))
+    {
+      data = gcnew KeyData();
+      data->KeyFrequency = noteFrequencies[item.Key];
+
+      auto envs = gcnew List<Envelope^>();
+      for each (auto p in params->ActiveEnvelopes)
+      {
+        if (p->Links->Count == 0)
+        {
+          continue;
+        }
+
+        envs->Add(gcnew Envelope(p, params->SampleRate));
+      }
+
+      data->ActiveEnvelopes = envs;
+
+      auto filter = gcnew List<Filter^>();
+      for each (auto p in params->ActiveFilter)
+      {
+        if (p->Mode == FilterMode::None)
+        {
+          continue;
+        }
+
+        filter->Add(gcnew Filter(p));
+      }
+
+      data->ActiveFilter = filter;
+
+      this->activeKeys[item.Value] = data;
+    }
+  }
+
   if (keysToRemove->Count > 0)
   {
     for each (short key in this->keysToRemove)
@@ -52,39 +90,14 @@ void AudioEngine::UpdateKeys(HashSet<short>^ currentKeys)
     }
     keysToRemove->Clear();
   }
-
-  for each (short key in currentKeys)
-  {
-    KeyData^ data;
-    if (!this->activeKeys->TryGetValue(key, data))
-    {
-      data = gcnew KeyData();
-      data->KeyFrequency = noteFrequencies[key];
-
-      auto envs = gcnew List<Envelope^>();
-      for each (auto p in params->ActiveEnvelopes)
-      {
-        envs->Add(gcnew Envelope(p, params->SampleRate));
-      }
-
-      data->ActiveEnvelopes = envs;
-
-      this->activeKeys[key] = data;
-    }
-  }
 }
 
-void AudioEngine::Run(HashSet<short>^ currentKeys, int length, array<float*>^ outBuffer)
+void AudioEngine::Run(Dictionary<short, int>^ currentKeys, int length, array<float*>^ outBuffer)
 {
   int channelCount = outBuffer->Length;
   for (int sampleIndex = 0; sampleIndex < length; sampleIndex++)
   {
     float sample = GenerateSample(currentKeys);
-
-    for each (Filter ^ filter in params->ActiveFilter)
-    {
-      sample = filter->Process(sample);
-    }
 
     for (int channelIndex = 0; channelIndex < channelCount; channelIndex++)
     {
@@ -96,7 +109,7 @@ void AudioEngine::Run(HashSet<short>^ currentKeys, int length, array<float*>^ ou
   }
 }
 
-double AudioEngine::GenerateSample(HashSet<short>^ currentKeys)
+double AudioEngine::GenerateSample(Dictionary<short, int>^ currentKeys)
 {
   UpdateKeys(currentKeys);
 
@@ -105,13 +118,13 @@ double AudioEngine::GenerateSample(HashSet<short>^ currentKeys)
   return sample;
 }
 
-double AudioEngine::GenerateKeys(HashSet<short>^ currentKeys)
+double AudioEngine::GenerateKeys(Dictionary<short, int>^ currentKeys)
 {
   double sample = 0.0;
   for each (auto item in this->activeKeys)
   {
     bool envOff = true;
-    bool released = !currentKeys->Contains(item.Key);
+    bool released = !currentKeys->ContainsValue(item.Key);
     for each (auto env in item.Value->ActiveEnvelopes)
     {
       envOff &= !env->Step(released);
@@ -125,7 +138,14 @@ double AudioEngine::GenerateKeys(HashSet<short>^ currentKeys)
 
     item.Value->Time += params->Tune->Get() / params->SampleRate;
 
-    sample += GenerateKey(item.Value);
+    double keySample = GenerateKey(item.Value);
+
+    for each (Filter ^ filter in item.Value->ActiveFilter)
+    {
+      keySample = filter->Process(keySample);
+    }
+
+    sample += keySample;
   }
   return sample;
 }
