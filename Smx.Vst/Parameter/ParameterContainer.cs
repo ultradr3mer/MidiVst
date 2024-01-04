@@ -31,6 +31,9 @@ namespace Smx.Vst.Parameter
         DefaultValue = defaultValue,
       };
 
+      modPara.SetMin(min);
+      modPara.SetMax(max);
+
       Action<float>? updateAction = v => modPara.SetBase(v);
       var smxManager = new SmxParameterManager(paramInfo, updateAction, min, max);
       smxManager.ModPara = modPara;
