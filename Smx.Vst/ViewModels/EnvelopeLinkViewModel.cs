@@ -1,34 +1,47 @@
 ﻿using Smx.Vst.Parameter;
+using Smx.Vst.Util;
+using System;
 
 namespace Smx.Vst.ViewModels
 {
   internal class EnvelopeLinkViewModel
   {
     private EnvelopeLinkParameterContainer item;
+    private Action<EnvelopeLinkViewModel> unlinkCallback;
 
-    public DailViewModel AmountVm { get; }
+    public EnvelopeLinkParameter Parameter { get => this.item.Parameter;  }
 
-    private int v;
-
-    public EnvelopeLinkViewModel(EnvelopeLinkParameterContainer item, int v)
+    public EnvelopeLinkViewModel(EnvelopeLinkParameterContainer item)
     {
       this.item = item;
       this.AmountVm = new DailViewModel(item.AmmountMgr);
-      this.v = v;
+      this.RemoveLinkCommand = new DelegateCommand(this.RemoveLinkCommandExecute);
     }
 
+    public DailViewModel AmountVm { get; }
     public string? LabelLong { get; private set; }
     public string? LabelShort { get; private set; }
+    public DelegateCommand RemoveLinkCommand { get; }
 
-    public EnvelopeLinkParameter Link(int envelopeId, int targetId, string? labelLong, string? labelShort)
+    public void Link(int envelopeId, int targetId, string? labelLong, string? labelShort, Action<EnvelopeLinkViewModel> unlinkCallback)
     {
       this.item.EnvelopeMgr.CurrentValue = envelopeId;
       this.item.TargetIdMgr.CurrentValue = targetId;
-      this.AmountVm.Value = 0.5;
       this.LabelLong = labelLong;
-      this.LabelShort = labelShort;
+      this.LabelShort = labelShort + ":";
 
-      return this.item.Parameter;
+      this.unlinkCallback = unlinkCallback;
+    }
+
+    private void RemoveLinkCommandExecute(object obj)
+    {
+      this.item.EnvelopeMgr.CurrentValue = -1;
+      this.item.TargetIdMgr.CurrentValue = -1;
+      this.AmountVm.Value = 0.5;
+      this.LabelLong = "";
+      this.LabelShort = "";
+
+      this.unlinkCallback?.Invoke(this);
     }
   }
 }

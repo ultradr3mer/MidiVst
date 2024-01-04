@@ -14,7 +14,7 @@ public:
   void SetEnv(float value)
   {
     mod = value;
-    result = fmaxf(fminf(base + value, max), min);
+    result = fmaxf(fminf(base + value * scale, max), min);
   }
   void SetMin(float value)
   {

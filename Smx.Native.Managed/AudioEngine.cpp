@@ -125,6 +125,9 @@ double AudioEngine::GenerateKeys(Dictionary<short, int>^ currentKeys)
   {
     bool envOff = true;
     bool released = !currentKeys->ContainsValue(item.Key);
+
+    params->AmpAmount->SetEnv(released ? -1.0 : 0.0);
+
     for each (auto env in item.Value->ActiveEnvelopes)
     {
       envOff &= !env->Step(released);
@@ -161,9 +164,9 @@ double AudioEngine::GenerateKey(KeyData^ data)
   return sample / length * params->AmpAmount->Get();
 }
 
-double AudioEngine::GenerateVoice(KeyData^ data, int vocieNr) {
+double AudioEngine::GenerateVoice(KeyData^ data, int voiceNr) {
   double shiftPerVoice = params->VoiceSpread->Get() / data->KeyFrequency / params->MinGenFactor;
-  double voiceTime = data->Time * (1.0 + vocieNr / 10.0 * params->VoiceDetune->Get()) + shiftPerVoice * vocieNr;
+  double voiceTime = data->Time * (1.0 + voiceNr / 10.0 * params->VoiceDetune->Get()) + shiftPerVoice * voiceNr;
 
   int shiftNr = 0;
   double generatorAggregate = params->FmMod ? 1.0 : 0.0;

@@ -35,10 +35,9 @@ namespace Smx.Vst.ViewModels
         EnvelopeVms.Add(new EnvelopeViewModel(item, parameters.SmxParameters.ModParaManager, UnasignedEnvelopeLinkVms, envNr++));
       }
 
-      int linkNr = 0;
       foreach (var item in parameters.SmxParameters.EnvelopeLinkManagerAry)
       {
-        var vm = new EnvelopeLinkViewModel(item, linkNr++);
+        var vm = new EnvelopeLinkViewModel(item);
         int linkEnvNr = item.Parameter.EnvelopeNr;
 
         if (linkEnvNr == -1) {

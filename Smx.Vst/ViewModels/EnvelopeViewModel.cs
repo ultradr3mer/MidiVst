@@ -69,10 +69,17 @@ namespace Smx.Vst.ViewModels
 
     public void Link(EnvelopeLinkViewModel vm, int targetId, string? labelLong, string? labelShort)
     {
-      var linkParams = vm.Link(this.i, targetId, labelLong, labelShort);
-      linkParams.TargetModPara = modManagers[targetId].ModPara;
+      vm.Link(this.i, targetId, labelLong, labelShort, this.Unlink);
+      vm.Parameter.TargetModPara = modManagers[targetId].ModPara;
       this.EnvelopeLinkViewModels.Add(vm);
-      this.item.Parameter.Links.Add(linkParams);
+      this.item.Parameter.Links.Add(vm.Parameter);
+    }
+
+    public void Unlink(EnvelopeLinkViewModel vm)
+    {
+      this.item.Parameter.Links.Remove(vm.Parameter);
+      this.EnvelopeLinkViewModels.Remove(vm);
+      unasignedEnvelopeLinkVms.Add(vm);
     }
 
     private bool AddLinkCommandCanExecute(object arg)

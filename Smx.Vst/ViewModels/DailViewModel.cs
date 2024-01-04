@@ -52,7 +52,7 @@ namespace Smx.Vst.ViewModels
       {
         ValueString = Value.ToString("0.00");
         manager.CurrentValue = (float)this.Value;
-        this?.PropertyChanged(this, new PropertyChangedEventArgs(nameof(NormalizedValue)));
+        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NormalizedValue)));
       }
     }
 

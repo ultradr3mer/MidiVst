@@ -19,19 +19,11 @@ bool Envelope::Step(bool released)
 {
   bool result = currentStage != EnvelopeStage::ENVELOPE_STAGE_OFF;
 
-  bool isReleasing = currentStage == EnvelopeStage::ENVELOPE_STAGE_RELEASE
-                    || currentStage == EnvelopeStage::ENVELOPE_STAGE_OFF;
-
   if (released 
-    && !isReleasing)
+    && currentStage != EnvelopeStage::ENVELOPE_STAGE_RELEASE
+    && currentStage != EnvelopeStage::ENVELOPE_STAGE_OFF)
   {
     this->enterStage(EnvelopeStage::ENVELOPE_STAGE_RELEASE);
-  }
-  else if (!released 
-    && isReleasing)
-  {
-    attackMinimumLevel = fmin(currentLevel, minimumLevel);
-    this->enterStage(EnvelopeStage::ENVELOPE_STAGE_ATTACK);
   }
 
   double sample = this->nextSample();
@@ -93,16 +85,14 @@ void Envelope::enterStage(EnvelopeStage newStage) {
   case EnvelopeStage::ENVELOPE_STAGE_DECAY:
     currentLevel = 1.0;
     calculateMultiplier(currentLevel,
-      fmax(getStageValue(EnvelopeStage::ENVELOPE_STAGE_SUSTAIN), minimumLevel),
+      fmax(parameters->Sustain, minimumLevel),
       nextStageSampleIndex);
     break;
   case EnvelopeStage::ENVELOPE_STAGE_SUSTAIN:
-    currentLevel = fmax(getStageValue(EnvelopeStage::ENVELOPE_STAGE_SUSTAIN), minimumLevel);
+    currentLevel = fmax(parameters->Sustain, minimumLevel);
     multiplier = 1.0;
     break;
   case EnvelopeStage::ENVELOPE_STAGE_RELEASE:
-    // We could go from ATTACK/DECAY to RELEASE,
-    // so we're not changing currentLevel here.
     calculateMultiplier(currentLevel,
       minimumLevel,
       nextStageSampleIndex);
