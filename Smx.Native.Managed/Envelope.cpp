@@ -3,7 +3,7 @@
 double Envelope::nextSample() {
   if (currentStage != ENVELOPE_STAGE_OFF &&
     currentStage != ENVELOPE_STAGE_SUSTAIN) {
-    if (currentSampleIndex == nextStageSampleIndex) {
+    if (currentSampleIndex >= nextStageSampleIndex) {
       EnvelopeStage newStage = static_cast<EnvelopeStage>(
         (currentStage + 1) % kNumEnvelopeStages
         );
@@ -30,7 +30,7 @@ bool Envelope::Step(bool released)
   else if (!released 
     && isReleasing)
   {
-    attackMinimumLevel = currentLevel;
+    attackMinimumLevel = fmin(currentLevel, minimumLevel);
     this->enterStage(ENVELOPE_STAGE_ATTACK);
   }
 

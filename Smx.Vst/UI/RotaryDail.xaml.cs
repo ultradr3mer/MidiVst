@@ -27,8 +27,14 @@ namespace Smx.Vst.UI
       this.MouseDown += Dail_MouseDown;
       this.MouseUp += Dail_MouseUp;
       this.MouseMove += Dail_MouseMove;
+      this.MouseDoubleClick += RotaryDail_MouseDoubleClick;
 
       this.DataContextChanged += RotaryDail_DataContextChanged;
+    }
+
+    private void RotaryDail_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+      this.viewModel.Reset();
     }
 
     private void RotaryDail_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

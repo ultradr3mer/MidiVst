@@ -15,21 +15,27 @@ public:
   ModPara^ AmpAmount;
   bool FmMod;
   ModPara^ SawAmount;
-  float Pow;
-  float Tune;
-  float UniDetune;
-  float UniPan;
+  ModPara^ Pow;
+  ModPara^ Tune;
+  ModPara^ UniDetune;
+  ModPara^ UniPan;
   int VoiceCount;
-  float VoiceSpread;
-  float VoiceDetune;
-  float MinGenFactor;
+  ModPara^ VoiceSpread;
+  ModPara^ VoiceDetune;
   float SampleRate;
+  float MinGenFactor;
 
   EngineParameter() {
     ActiveFilter = gcnew List<Filter^>();
     ActiveGenerators = gcnew List<GeneratorParameter^>();
-    SawAmount = gcnew ModPara();
     AmpAmount = gcnew ModPara();
+    SawAmount = gcnew ModPara();
+    Pow = gcnew ModPara();
+    Tune = gcnew ModPara();
+    UniDetune = gcnew ModPara();
+    UniPan = gcnew ModPara();
+    VoiceSpread = gcnew ModPara();
+    VoiceDetune = gcnew ModPara();
   };
 
   List<Filter^>^ ActiveFilter;

@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Smx.Vst.UI"
              mc:Ignorable="d"
-             Height="130" d:DesignWidth="250"
+             Height="130" d:DesignWidth="330"
              Foreground="{DynamicResource MahApps.Brushes.SystemControlPageTextBaseMedium}">
   <UserControl.Resources>
     <ResourceDictionary Source="/Smx.Vst;component/UI/StyleDictionary.xaml"/>
@@ -23,6 +23,7 @@
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="*" />
         <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
       <StackPanel Orientation="Horizontal" 
                 VerticalAlignment="Top" 
@@ -37,12 +38,14 @@
                 Width="120" Height="24"/>
       </StackPanel>
       <TextBlock Grid.ColumnSpan="4" Margin="2" Text="{Binding FilterName}" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-      <TextBlock Margin="2" Text="Fltr.Cut.:" Grid.Row="1" Grid.Column="0" FontSize="10" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+      <TextBlock Margin="2" Text="Cut:" Grid.Row="1" Grid.Column="0" FontSize="10" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
       <local:RotaryDail DataContext="{Binding DailViewModelCut}" Grid.Row="2" Grid.Column="0" Width="70" Height="70" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-      <TextBlock Margin="2" Text="Fltr.Wet.Amt.:" Grid.Row="1" Grid.Column="1" FontSize="10" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+      <TextBlock Margin="2" Text="Wet.Amt.:" Grid.Row="1" Grid.Column="1" FontSize="10" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
       <local:RotaryDail DataContext="{Binding DailViewModelWetAmt}" Grid.Row="2" Grid.Column="1" Width="70" Height="70" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-      <TextBlock Margin="2" Text="Fltr.Reson.:" Grid.Row="1" Grid.Column="2" FontSize="10" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+      <TextBlock Margin="2" Text="Resonance:" Grid.Row="1" Grid.Column="2" FontSize="10" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
       <local:RotaryDail DataContext="{Binding DailViewModelRes}" Grid.Row="2" Grid.Column="2" Width="70" Height="70" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+      <TextBlock Margin="2" Text="Cycles:" Grid.Row="1" Grid.Column="3" FontSize="10" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+      <local:RotaryDail DataContext="{Binding DailViewModelCycles}" Grid.Row="2" Grid.Column="3" Width="70" Height="70" HorizontalAlignment="Center" VerticalAlignment="Center"/>
     </Grid>
   </Border>
 </UserControl>

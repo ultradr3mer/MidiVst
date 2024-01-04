@@ -13,6 +13,7 @@ namespace Smx.Vst.Parameter
       AmpMgr = CreateFloatMod(name: "Amp",
                       label: "Amp Amount",
                       shortLabel: "Amp Amt.",
+                      defaultValue: 1,
                       modPara: EngineParameter.AmpAmount);
       SawMgr = CreateFloatMod(name: "Saw",
                                   label: "Saw Amount (1.0 Saw - 0.0 Sin)",
@@ -22,29 +23,29 @@ namespace Smx.Vst.Parameter
                               "FM Modulation",
                               "FM Mod",
                            updateAction: v => EngineParameter.FmMod = v);
-      PowMgr = CreateFloat(name: "Pow",
+      PowMgr = CreateFloatMod(name: "Pow",
                            label: "Power to raise by",
                            shortLabel: "Power",
                            defaultValue: 1.0f,
-                           updateAction: v => EngineParameter.Pow = v);
+                           modPara: EngineParameter.Pow);
 
 
-      UniDetMgr = CreateFloat(name: "UniDet",
+      UniDetMgr = CreateFloatMod(name: "UniDet",
                               label: "Unison Detune",
                               shortLabel: "Uni.Det.",
-                              updateAction: v => EngineParameter.UniDetune = v);
-      UniPanMgr = CreateFloat(name: "UniPan",
+                              modPara: EngineParameter.UniDetune);
+      UniPanMgr = CreateFloatMod(name: "UniPan",
                               label: "Unison Pan",
                               shortLabel: "Uni.Pan.",
-                              updateAction: v => EngineParameter.UniPan = v);
+                              modPara: EngineParameter.UniPan);
 
-      TuneMgr = CreateFloat(name: "Tune",
+      TuneMgr = CreateFloatMod(name: "Tune",
                             label: "Tune",
                             shortLabel: "Tune",
                             defaultValue: 1.0f,
                             min: 0.0f,
                             max: 2.0f,
-                            updateAction: v => EngineParameter.Tune = v);
+                            modPara: EngineParameter.Tune);
 
       VoiceCountMgr = CreateInteger(name: "VoiCount",
             label: "Voice Count",
@@ -54,15 +55,15 @@ namespace Smx.Vst.Parameter
             defaultValue: 1,
             updateAction: v => EngineParameter.VoiceCount = v);
 
-      VoiceDetuneMgr = CreateFloat(name: "VoiDet",
+      VoiceDetuneMgr = CreateFloatMod(name: "VoiDet",
             label: "Voice Detune",
             shortLabel: "Voi.Det.",
-            updateAction: v => EngineParameter.VoiceDetune = v);
+            modPara: EngineParameter.VoiceDetune);
 
-      VoiceSpreadMgr = CreateFloat(name: "VoiSprd",
+      VoiceSpreadMgr = CreateFloatMod(name: "VoiSprd",
             label: "Voice Spread",
             shortLabel: "Voi.Spr.",
-            updateAction: v => EngineParameter.VoiceSpread = v);
+            modPara: EngineParameter.VoiceSpread);
     }
 
     public EngineParameter EngineParameter { get; }

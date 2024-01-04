@@ -1,8 +1,18 @@
 #pragma once
+#include "ModPara.h"
+
 public ref class FilterParameter {
 public:
   int Mode;
-  double Cutoff;
-  double WetAmt;
-  double Resonance;
+  int Cycles;
+  ModPara^ Cutoff;
+  ModPara^ WetAmt;
+  ModPara^ Resonance;
+
+  FilterParameter() {
+    Cycles = 1;
+    Cutoff = gcnew ModPara();
+    WetAmt = gcnew ModPara();
+    Resonance = gcnew ModPara();
+  }
 };

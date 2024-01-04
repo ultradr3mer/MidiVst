@@ -12,7 +12,7 @@ namespace Smx.Vst.ViewModels
     {
       this.manager = manager;
       PropertyChanged += DailViewModel_PropertyChanged;
-
+      this.defaultValue = manager.ParameterInfo.DefaultValue;
       this.Value = manager.CurrentValue;
       this.ShortLabel = manager.ParameterInfo.ShortLabel;
     }
@@ -33,13 +33,18 @@ namespace Smx.Vst.ViewModels
         var targetScale = this.manager.Max - this.manager.Min;
         this.Value = value * targetScale + this.manager.Min;
         if (manager.IsInteger || manager.IsSwitch)
+        {
           this.Value = (int)this.Value;
+        }
       }
     }
 
     public string ShortLabel { get; }
+
+    private float defaultValue;
+
     public double Value { get; set; }
-    public string? ValueString { get; set; }
+    public string? ValueString { get; set; } = "0.00";
 
     private void DailViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -49,6 +54,11 @@ namespace Smx.Vst.ViewModels
         manager.CurrentValue = (float)this.Value;
         this?.PropertyChanged(this, new PropertyChangedEventArgs(nameof(NormalizedValue)));
       }
+    }
+
+    internal void Reset()
+    {
+      this.Value = defaultValue;
     }
   }
 }

@@ -5,8 +5,8 @@
 public ref class Filter {
 private:
   FilterParameter^ parameters;
-  double buf0;
-  double buf1;
+  array<double>^ buf0;
+  array<double>^ buf1;
 
 public:
   Filter(FilterParameter^ parameters);
@@ -15,4 +15,5 @@ public:
 private:
   double CalcFeedbackAmount(double cutoff);
   double ProcessInternal(double inputValue, FilterMode mode);
+  double ProcessCycle(double inputValue, FilterMode mode, int cycle);
 };

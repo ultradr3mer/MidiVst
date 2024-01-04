@@ -17,6 +17,7 @@ namespace Smx.Vst.ViewModels
       DailViewModelCut = new DailViewModel(item.FltrCtMgr);
       DailViewModelWetAmt = new DailViewModel(item.FltrWAMgr);
       DailViewModelRes = new DailViewModel(item.FltrReMgr);
+      DailViewModelCycles = new DailViewModel(item.FltrCyclesMgr);
 
       FilterModes = Enum.GetValues(typeof(FilterMode))
                     .OfType<FilterMode>()
@@ -41,6 +42,7 @@ namespace Smx.Vst.ViewModels
     public DailViewModel DailViewModelCut { get; set; }
     public DailViewModel DailViewModelRes { get; set; }
     public DailViewModel DailViewModelWetAmt { get; set; }
+    public DailViewModel DailViewModelCycles { get; set; }
     public List<FilterModeItem> FilterModes { get; }
     public FilterModeItem? SelectedMode { get; set; }
     public string FilterName { get; }

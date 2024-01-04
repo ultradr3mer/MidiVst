@@ -72,8 +72,6 @@ void AudioEngine::UpdateKeys(HashSet<short>^ currentKeys)
       this->activeKeys[key] = data;
     }
   }
-
- 
 }
 
 void AudioEngine::Run(HashSet<short>^ currentKeys, int length, array<float*>^ outBuffer)
@@ -122,11 +120,10 @@ double AudioEngine::GenerateKeys(HashSet<short>^ currentKeys)
     if (envOff && released)
     {
       this->keysToRemove->Add(item.Key);
-      this->activeKeys->Remove(item.Key);
       continue;
     }
 
-    item.Value->Time += params->Tune / params->SampleRate;
+    item.Value->Time += params->Tune->Get() / params->SampleRate;
 
     sample += GenerateKey(item.Value);
   }
@@ -145,8 +142,8 @@ double AudioEngine::GenerateKey(KeyData^ data)
 }
 
 double AudioEngine::GenerateVoice(KeyData^ data, int vocieNr) {
-  double shiftPerVoice = params->VoiceSpread / data->KeyFrequency / params->MinGenFactor;
-  double voiceTime = data->Time * (1.0 + vocieNr / 10.0 * params->VoiceDetune) + shiftPerVoice * vocieNr;
+  double shiftPerVoice = params->VoiceSpread->Get() / data->KeyFrequency / params->MinGenFactor;
+  double voiceTime = data->Time * (1.0 + vocieNr / 10.0 * params->VoiceDetune->Get()) + shiftPerVoice * vocieNr;
 
   int shiftNr = 0;
   double generatorAggregate = params->FmMod ? 1.0 : 0.0;
@@ -154,10 +151,10 @@ double AudioEngine::GenerateVoice(KeyData^ data, int vocieNr) {
   for each (GeneratorParameter ^ genPara in params->ActiveGenerators)
   {
     auto time = voiceTime * data->KeyFrequency * 4.0 * genPara->Factor
-      * (1.0 + shiftNr / 100.0 * params->UniDetune)
-      + params->UniPan * shiftNr++ / params->ActiveGenerators->Count;
+      * (1.0 + shiftNr / 100.0 * params->UniDetune->Get())
+      + params->UniPan->Get() * shiftNr++ / params->ActiveGenerators->Count;
 
-    double sample = AudioEngine::Wave(params->SawAmount->Get(), time, params->Pow);
+    double sample = AudioEngine::Wave(params->SawAmount->Get(), time, params->Pow->Get());
 
     generatorAggregate = params->FmMod ? (generatorAggregate * 1.5 * sample)
       : (generatorAggregate + sample / params->ActiveGenerators->Count);
