@@ -12,12 +12,8 @@ using namespace System::Runtime::InteropServices;
 public ref class EngineParameter
 {
 public:
+  ModPara^ AmpAmount;
   bool FmMod;
-  float Attack;
-  float Release;
-  float InitialDetune;
-  float InitialDetuneAcceleration;
-  float InitialDetuneFriction;
   ModPara^ SawAmount;
   float Pow;
   float Tune;
@@ -33,6 +29,7 @@ public:
     ActiveFilter = gcnew List<Filter^>();
     ActiveGenerators = gcnew List<GeneratorParameter^>();
     SawAmount = gcnew ModPara();
+    AmpAmount = gcnew ModPara();
   };
 
   List<Filter^>^ ActiveFilter;

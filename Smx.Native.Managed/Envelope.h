@@ -6,7 +6,7 @@
 
 public ref class Envelope {
 public:
-  void Step(bool released);
+  bool Step(bool released);
   inline EnvelopeStage getCurrentStage() { return currentStage; };
   const double minimumLevel;
 

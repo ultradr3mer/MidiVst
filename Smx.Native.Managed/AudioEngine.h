@@ -17,7 +17,7 @@ public:
   static int MaxEnvelopes = 4;
   static int MaxEnvelopeLinks = 12;
   inline bool GetHasActiveKeys() {
-    return this->ActiveKeys->Count >= 0;
+    return this->activeKeys->Count >= 0;
   };
 private:
   Dictionary<int, float>^ InitializeNoteFrequencies();
@@ -29,5 +29,6 @@ private:
   double GenerateKeys(HashSet<short>^ currentKeys);
   double GenerateKey(KeyData^ data);
   double GenerateVoice(KeyData^ data, int voiceNr);
-  Dictionary<short, KeyData^>^ ActiveKeys;
+  Dictionary<short, KeyData^>^ activeKeys;
+  List<short>^ keysToRemove;
 };

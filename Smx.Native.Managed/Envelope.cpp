@@ -15,8 +15,10 @@ double Envelope::nextSample() {
   return currentLevel;
 }
 
-void Envelope::Step(bool released)
+bool Envelope::Step(bool released)
 {
+  bool result = currentStage != ENVELOPE_STAGE_OFF;
+
   if (released 
     && currentStage != ENVELOPE_STAGE_RELEASE
     && currentStage != ENVELOPE_STAGE_OFF)
@@ -31,6 +33,8 @@ void Envelope::Step(bool released)
     double value = sample * item->Ammount;
     item->TargetModPara->SetEnv(value);
   }
+
+  return result;
 }
 
 void Envelope::calculateMultiplier(double startLevel,

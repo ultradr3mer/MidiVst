@@ -6,8 +6,8 @@ AudioEngine::AudioEngine(EngineParameter^ params)
 {
   this->params = params;
   this->noteFrequencies = InitializeNoteFrequencies();
-  this->ActiveKeys = gcnew Dictionary<short, KeyData^>();
-
+  this->activeKeys = gcnew Dictionary<short, KeyData^>();
+  this->keysToRemove = gcnew List<short>();
 }
 
 AudioEngine::~AudioEngine()
@@ -44,14 +44,21 @@ double AudioEngine::Wave(double saw, double t, double pow)
 
 void AudioEngine::UpdateKeys(HashSet<short>^ currentKeys)
 {
+  if (keysToRemove->Count > 0)
+  {
+    for each (short key in this->keysToRemove)
+    {
+      this->activeKeys->Remove(key);
+    }
+    keysToRemove->Clear();
+  }
+
   for each (short key in currentKeys)
   {
     KeyData^ data;
-    if (!this->ActiveKeys->TryGetValue(key, data))
+    if (!this->activeKeys->TryGetValue(key, data))
     {
       data = gcnew KeyData();
-      data->Actuation;
-      data->Detune = pow(params->InitialDetune, 2.0);
       data->KeyFrequency = noteFrequencies[key];
 
       auto envs = gcnew List<Envelope^>();
@@ -62,63 +69,11 @@ void AudioEngine::UpdateKeys(HashSet<short>^ currentKeys)
 
       data->ActiveEnvelopes = envs;
 
-      this->ActiveKeys[key] = data;
-    }
-
-    if (data->Actuation < 1)
-    {
-      if (params->Attack == 0)
-      {
-        data->Actuation = 1;
-      }
-      else
-      {
-        data->Actuation = fmin(data->Actuation + 1.0 / params->Attack / params->SampleRate, 1.0);
-      }
+      this->activeKeys[key] = data;
     }
   }
 
-  for each (auto item in this->ActiveKeys)
-  {
-    float sampleRate = params->SampleRate;
-    auto data = item.Value;
-    if (data->Detune != 1.0 || data->DetuneVec != 0.0)
-    {
-      double pull = (1.0 - data->Detune) * params->InitialDetuneAcceleration * 100000.0;
-      double scaledFriction = params->InitialDetuneFriction / sampleRate * 1000.0;
-      data->DetuneVec = (data->DetuneVec + pull / sampleRate) * (1.0 - scaledFriction);
-      data->Detune += data->DetuneVec / sampleRate;
-      data->Time += data->Detune / sampleRate;
-    }
-    else
-    {
-      data->Time += 1.0 / sampleRate;
-    }
-
-    if (currentKeys->Contains(item.Key))
-    {
-      continue;
-    }
-
-    float keyActuation;
-    if (params->Release == 0)
-    {
-      keyActuation = 0;
-    }
-    else
-    {
-      keyActuation = fmax(data->Actuation - 1.0 / params->Release / sampleRate, 0.0);
-    }
-
-    if (keyActuation <= 0)
-    {
-      this->ActiveKeys->Remove(item.Key);
-    }
-    else
-    {
-      this->ActiveKeys[item.Key]->Actuation = keyActuation;
-    }
-  }
+ 
 }
 
 void AudioEngine::Run(HashSet<short>^ currentKeys, int length, array<float*>^ outBuffer)
@@ -155,13 +110,23 @@ double AudioEngine::GenerateSample(HashSet<short>^ currentKeys)
 double AudioEngine::GenerateKeys(HashSet<short>^ currentKeys)
 {
   double sample = 0.0;
-  for each (auto item in this->ActiveKeys)
+  for each (auto item in this->activeKeys)
   {
+    bool envOff = true;
     bool released = !currentKeys->Contains(item.Key);
     for each (auto env in item.Value->ActiveEnvelopes)
     {
-      env->Step(released);
+      envOff &= !env->Step(released);
     }
+
+    if (envOff && released)
+    {
+      this->keysToRemove->Add(item.Key);
+      this->activeKeys->Remove(item.Key);
+      continue;
+    }
+
+    item.Value->Time += params->Tune / params->SampleRate;
 
     sample += GenerateKey(item.Value);
   }
@@ -176,7 +141,7 @@ double AudioEngine::GenerateKey(KeyData^ data)
   {
     sample += GenerateVoice(data, i);
   }
-  return sample / length;
+  return sample / length * params->AmpAmount->Get();
 }
 
 double AudioEngine::GenerateVoice(KeyData^ data, int vocieNr) {
@@ -188,7 +153,7 @@ double AudioEngine::GenerateVoice(KeyData^ data, int vocieNr) {
 
   for each (GeneratorParameter ^ genPara in params->ActiveGenerators)
   {
-    auto time = voiceTime * data->KeyFrequency * 4.0 * params->Tune * genPara->Factor
+    auto time = voiceTime * data->KeyFrequency * 4.0 * genPara->Factor
       * (1.0 + shiftNr / 100.0 * params->UniDetune)
       + params->UniPan * shiftNr++ / params->ActiveGenerators->Count;
 
