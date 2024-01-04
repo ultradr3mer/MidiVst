@@ -19,11 +19,19 @@ bool Envelope::Step(bool released)
 {
   bool result = currentStage != ENVELOPE_STAGE_OFF;
 
+  bool isReleasing = currentStage == ENVELOPE_STAGE_RELEASE
+                    || currentStage == ENVELOPE_STAGE_OFF;
+
   if (released 
-    && currentStage != ENVELOPE_STAGE_RELEASE
-    && currentStage != ENVELOPE_STAGE_OFF)
+    && !isReleasing)
   {
     this->enterStage(ENVELOPE_STAGE_RELEASE);
+  }
+  else if (!released 
+    && isReleasing)
+  {
+    attackMinimumLevel = currentLevel;
+    this->enterStage(ENVELOPE_STAGE_ATTACK);
   }
 
   double sample = this->nextSample();
@@ -77,7 +85,7 @@ void Envelope::enterStage(EnvelopeStage newStage) {
     multiplier = 1.0;
     break;
   case ENVELOPE_STAGE_ATTACK:
-    currentLevel = minimumLevel;
+    currentLevel = attackMinimumLevel;
     calculateMultiplier(currentLevel,
       1.0,
       nextStageSampleIndex);
