@@ -42,8 +42,6 @@ namespace Smx.Vst.Smx
 
     internal void Generate(float sampleRate, VstAudioBuffer[] outChannels)
     {
-      //sw.Restart();
-
       engineParameter.SampleRate = sampleRate;
       engineParameter.ActiveGenerators = GeneratorList.List.Where(g => parameters.GenParameterContainer[g.Index].CurrentValue == 1)
                                   .OfType<GeneratorParameter>()
@@ -64,18 +62,6 @@ namespace Smx.Vst.Smx
 
         nativeEngine.Run(keys, length, bufferAry);
       }
-
-      //sw.Stop();
-      //runtimeTicks += sw.ElapsedTicks;
-      //processedSamples += length;
-
-      //if (processedSamples >= sampleRate)
-      //{
-      //  var processedTicks = (long)(processedSamples * TimeSpan.TicksPerSecond / sampleRate);
-      //  Debug.WriteLine($"Runtime {runtimeTicks / processedTicks * 100:0.00}% {(float)runtimeTicks / (float)TimeSpan.TicksPerSecond}ms for {processedSamples} samples");
-      //  runtimeTicks = 0;
-      //  processedSamples = 0;
-      //}
     }
 
     internal void ProcessNoteOffEvent(byte v)
@@ -85,7 +71,10 @@ namespace Smx.Vst.Smx
 
     internal void ProcessNoteOnEvent(byte v)
     {
-      keys.Add(v,keyNumber++);
+      unchecked
+      {
+        keys[v] = keyNumber++;
+      }
     }
   }
 }

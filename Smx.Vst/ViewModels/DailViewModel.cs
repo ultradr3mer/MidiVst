@@ -14,7 +14,7 @@ namespace Smx.Vst.ViewModels
       PropertyChanged += DailViewModel_PropertyChanged;
       this.defaultValue = manager.ParameterInfo.DefaultValue;
       this.Value = manager.CurrentValue;
-      this.ShortLabel = manager.ParameterInfo.ShortLabel;
+      this.ShortLabel = manager.ParameterInfo.ShortLabel+":";
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

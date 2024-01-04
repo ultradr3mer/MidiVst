@@ -13,6 +13,7 @@
   internal sealed class MidiProcessor : IVstMidiProcessor
   {
     private readonly Smx.NativeEngineHost generator;
+    private int keyNumber;
 
     /// <summary>
     /// Constructs a new instance.
@@ -39,8 +40,8 @@
     /// <param name="events">The midi events for the current cycle.</param>
     public void Process(VstEventCollection events)
     {
-      var keyOffQueue = new ConcurrentQueue<byte>();
-      var keyOnQueue = new ConcurrentQueue<byte>();
+      //var keyOffQueue = new ConcurrentQueue<byte>();
+      //var keyOnQueue = new ConcurrentQueue<byte>();
 
       foreach (VstEvent evnt in events)
       {
@@ -51,7 +52,7 @@
           // pass note on and note off to the sample manager
           if ((midiEvent.Data[0] & (int)MidiChannelVoiceMessages.Mask) == (int)MidiChannelVoiceMessages.NoteOffEvent)
           {
-            keyOffQueue.Enqueue(midiEvent.Data[1]);
+            generator.ProcessNoteOffEvent(midiEvent.Data[1]);
           }
 
           if ((midiEvent.Data[0] & (int)MidiChannelVoiceMessages.Mask) == (int)MidiChannelVoiceMessages.NoteOnEvent)
@@ -59,25 +60,26 @@
             // note on with velocity = 0 is a note off
             if (midiEvent.Data[2] == 0)
             {
-              keyOffQueue.Enqueue(midiEvent.Data[1]);
+              generator.ProcessNoteOffEvent(midiEvent.Data[1]);
             }
             else
             {
-              keyOnQueue.Enqueue(midiEvent.Data[1]);
+              generator.ProcessNoteOnEvent(midiEvent.Data[1]);
             }
           }
         }
       }
 
-      foreach (var item in keyOnQueue)
-      {
-        generator.ProcessNoteOnEvent(item);
-      }
+      //foreach (var item in keyOffQueue)
+      //{
+      //  generator.ProcessNoteOffEvent(item);
+      //}
 
-      foreach (var item in keyOffQueue)
-      {
-        generator.ProcessNoteOffEvent(item);
-      }
+      //foreach (var item in keyOnQueue)
+      //{
+      //  generator.ProcessNoteOnEvent(item);
+      //}
+
     }
 
     #endregion IVstMidiProcessor Members
