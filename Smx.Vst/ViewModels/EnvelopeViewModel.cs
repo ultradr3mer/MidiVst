@@ -16,17 +16,16 @@ namespace Smx.Vst.ViewModels
 
     private readonly int i;
     private readonly EnvelopeParameterContainer item;
-    private readonly Dictionary<int, SmxParameterManager> modManagers;
     private readonly BindingList<EnvelopeLinkViewModel> unasignedEnvelopeLinkVms;
 
-    public EnvelopeViewModel(EnvelopeParameterContainer item, Dictionary<int, SmxParameterManager> modManagers, BindingList<EnvelopeLinkViewModel> unasignedEnvelopeLinkVms, int i)
+    public EnvelopeViewModel(EnvelopeParameterContainer item, List<SmxParameterManager> modManagers, BindingList<EnvelopeLinkViewModel> unasignedEnvelopeLinkVms, int i)
     {
       this.AttackVm = new DailViewModel(item.AttackMgr);
       this.DecayVm = new DailViewModel(item.DecayMgr);
       this.SustainVm = new DailViewModel(item.SustainMgr);
       this.ReleaseVm = new DailViewModel(item.ReleaseMgr);
 
-      this.EnvelopeLinkableItems = new[] { DefaultItem }.Concat(modManagers.Values.Select(m => new EnvelopeLinkableItem()
+      this.EnvelopeLinkableItems = new[] { DefaultItem }.Concat(modManagers.Select(m => new EnvelopeLinkableItem()
       {
         ModPara = m.ModPara,
         LabelLong = m.ParameterInfo.Label,
@@ -38,7 +37,6 @@ namespace Smx.Vst.ViewModels
 
       this.EnvelopeName = $"Env#{i}";
       this.item = item;
-      this.modManagers = modManagers;
       this.unasignedEnvelopeLinkVms = unasignedEnvelopeLinkVms;
       this.AddLinkCommand = new DelegateCommand(AddLinkCommandExecute, AddLinkCommandCanExecute);
 
@@ -70,14 +68,11 @@ namespace Smx.Vst.ViewModels
     public void Link(EnvelopeLinkViewModel vm, int targetId, string? labelLong, string? labelShort)
     {
       vm.Link(this.i, targetId, labelLong, labelShort, this.Unlink);
-      vm.Parameter.TargetModPara = modManagers[targetId].ModPara;
       this.EnvelopeLinkViewModels.Add(vm);
-      this.item.Parameter.Links.Add(vm.Parameter);
     }
 
     public void Unlink(EnvelopeLinkViewModel vm)
     {
-      this.item.Parameter.Links.Remove(vm.Parameter);
       this.EnvelopeLinkViewModels.Remove(vm);
       unasignedEnvelopeLinkVms.Add(vm);
     }

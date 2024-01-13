@@ -10,9 +10,6 @@
   <UserControl.Resources>
     <ResourceDictionary Source="/Smx.Vst;component/UI/StyleDictionary.xaml"/>
   </UserControl.Resources>
-  <Border BorderBrush="{StaticResource MahApps.Brushes.SubMenu.Border}"
-          Background="{StaticResource MahApps.Brushes.Menu.Background}"
-          BorderThickness="1.0">
     <Grid Margin="4">
       <Grid.RowDefinitions>
         <RowDefinition Height="20"/>
@@ -24,5 +21,4 @@
       <TextBlock Margin="2" Text="{Binding ShortLabel}" Grid.Row="0" Grid.Column="0" FontSize="10" HorizontalAlignment="Left" VerticalAlignment="Top"/>
       <local:RotaryDail Grid.Row="1" Grid.Column="0" Width="70" Height="70" HorizontalAlignment="Center" VerticalAlignment="Center"/>
     </Grid>
-  </Border>
 </UserControl>

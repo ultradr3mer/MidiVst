@@ -6,6 +6,4 @@ public:
   double Ammount = 0;
   int EnvelopeNr;
   int TargetId;
-
-  ModPara^ TargetModPara;
 };

@@ -28,8 +28,10 @@ namespace Smx.Vst.Smx
       this.parameters = parameters.SmxParameters;
 
       engineParameter = this.parameters.GeneralParameter.EngineParameter;
+      engineParameter.EnvelopeLinks = this.parameters.EnvelopeLinkManagerAry.Select(o => o.Parameter).ToList();
+      engineParameter.ModParameter = this.parameters.ModParaManager.Select(o => o.ModPara).ToList();
       nativeEngine = new AudioEngine(engineParameter);
-
+      
       foreach (var container in this.parameters.FilterManagerAry)
       {
         engineParameter.ActiveFilter.Add(container.FilterParamer);

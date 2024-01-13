@@ -28,10 +28,9 @@ bool Envelope::Step(bool released)
 
   double sample = this->nextSample();
 
-  for each (auto item in parameters->Links)
+  for each (auto item in linkedParams)
   {
-    double value = sample * item->Ammount;
-    item->TargetModPara->SetEnv(value);
+    item->SetEnv(sample);
   }
 
   return result;

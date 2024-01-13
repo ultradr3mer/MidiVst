@@ -1,11 +1,13 @@
 ﻿using Jacobi.Vst.Plugin.Framework;
 using Smx.Vst.Util;
+using System.Windows.Forms;
 
 namespace Smx.Vst.Parameter
 {
   internal class EnvelopeLinkParameterContainer : ParameterContainer
   {
-    public EnvelopeLinkParameterContainer(VstParameterCategory paramCategory, int i) : base(paramCategory)
+    public EnvelopeLinkParameterContainer(VstParameterCategory paramCategory,
+                                          int i) : base(paramCategory)
     {
       char letter = (char)('A' + i);
 

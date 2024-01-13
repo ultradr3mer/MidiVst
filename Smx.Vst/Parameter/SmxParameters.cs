@@ -33,7 +33,7 @@ namespace Smx.Vst.Parameter
     public FilterParameterContainer[] FilterManagerAry { get; private set; }
     public EnvelopeLinkParameterContainer[] EnvelopeLinkManagerAry { get; private set; }
     public List<SmxParameterManager> AllManager { get; private set; }
-    public Dictionary<int, SmxParameterManager> ModParaManager { get; private set; }
+    public List<SmxParameterManager> ModParaManager { get; private set; }
 
     private void InitializeParameters(PluginParameters parameters)
     {
@@ -60,6 +60,16 @@ namespace Smx.Vst.Parameter
                                     .Select(i => new EnvelopeParameterContainer(paramCategory, i))
                                     .ToArray();
       AllManager.AddRange(EnvelopeManagerAry.SelectMany(m => m));
+
+      var envelopeParameter  = EnvelopeManagerAry.Select(p => p.Parameter).ToArray();
+      ModParaManager = this.AllManager.Where(m => m.ModPara != null).ToList();
+
+      int modParaId = 0;
+      foreach (var modPara in ModParaManager)
+      {
+        modPara.ModParaIndex = modParaId++;
+      }
+
       EnvelopeLinkManagerAry = Enumerable.Range(0, AudioEngine.MaxEnvelopeLinks)
                                     .Select(i => new EnvelopeLinkParameterContainer(paramCategory, i))
                                     .ToArray();
@@ -67,8 +77,6 @@ namespace Smx.Vst.Parameter
 
       parameterInfos.AddRange(AllManager.Select(m => m.ParameterInfo));
 
-      int modParaId = 0;
-      ModParaManager = this.AllManager.Where(m => m.ModPara != null).ToDictionary(m => m.ModParaIndex = modParaId++);
     }
   }
 }

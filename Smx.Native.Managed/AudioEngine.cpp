@@ -53,14 +53,29 @@ void AudioEngine::UpdateKeys(Dictionary<short, int>^ currentKeys)
       data->KeyFrequency = noteFrequencies[item.Key];
 
       auto envs = gcnew List<Envelope^>();
-      for each (auto p in params->ActiveEnvelopes)
+      int length = params->ActiveEnvelopes->Count;
+      for (int envId = 0; envId < length; envId++)
       {
-        if (p->Links->Count == 0)
+        auto linkParas = gcnew List<ModPara^>();
+        for each (auto linkP in params->EnvelopeLinks)
+        {
+          if (linkP->EnvelopeNr != envId)
+          {
+            continue;
+          }
+
+          auto modPara = params->ModParameter[linkP->TargetId];
+          modPara->SetAmt(linkP->Ammount);
+
+          linkParas->Add(modPara);
+        }
+        
+        if (linkParas->Count == 0)
         {
           continue;
         }
 
-        envs->Add(gcnew Envelope(p, params->SampleRate));
+        envs->Add(gcnew Envelope(params->ActiveEnvelopes[envId], linkParas, params->SampleRate));
       }
 
       data->ActiveEnvelopes = envs;
@@ -94,6 +109,7 @@ void AudioEngine::UpdateKeys(Dictionary<short, int>^ currentKeys)
 
 void AudioEngine::Run(Dictionary<short, int>^ currentKeys, int length, array<float*>^ outBuffer)
 {
+
   int channelCount = outBuffer->Length;
   for (int sampleIndex = 0; sampleIndex < length; sampleIndex++)
   {

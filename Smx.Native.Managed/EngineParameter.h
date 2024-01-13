@@ -28,6 +28,7 @@ public:
   EngineParameter() {
     ActiveFilter = gcnew List<FilterParameter^>();
     ActiveGenerators = gcnew List<GeneratorParameter^>();
+    ModParameter = gcnew List<ModPara^>();
     AmpAmount = gcnew ModPara();
     SawAmount = gcnew ModPara();
     Pow = gcnew ModPara();
@@ -41,5 +42,7 @@ public:
   List<FilterParameter^>^ ActiveFilter;
   List<EnvelopeParameter^>^ ActiveEnvelopes;
   List<GeneratorParameter^>^ ActiveGenerators;
+  List<ModPara^>^ ModParameter;
+  List<EnvelopeLinkParameter^>^ EnvelopeLinks;
 };
 

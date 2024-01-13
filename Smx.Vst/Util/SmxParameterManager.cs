@@ -56,5 +56,10 @@ namespace Smx.Vst.Util
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentValue)));
       }
     }
+
+    public override string ToString()
+    {
+      return $"{this.ParameterInfo.Label}: {this.CurrentValue}";
+    }
   }
 }

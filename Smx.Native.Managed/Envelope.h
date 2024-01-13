@@ -9,7 +9,7 @@ public:
   bool Step(bool released);
   inline EnvelopeStage getCurrentStage() { return currentStage; };
 
-  Envelope(EnvelopeParameter^ paras, double sampleRate) :
+  Envelope(EnvelopeParameter^ paras, List<ModPara^>^ linkedParams, double sampleRate) :
     minimumLevel(0.0001),
     attackMinimumLevel(0.0001),
     currentStage(EnvelopeStage::ENVELOPE_STAGE_OFF),
@@ -18,6 +18,7 @@ public:
     sampleRate(sampleRate),
     currentSampleIndex(0),
     nextStageSampleIndex(0),
+    linkedParams(linkedParams),
     parameters(paras) {
     enterStage(EnvelopeStage::ENVELOPE_STAGE_ATTACK);
   };
@@ -29,6 +30,7 @@ private:
   double multiplier;
   double sampleRate;
   EnvelopeParameter^ parameters;
+  List<ModPara^>^ linkedParams;
   void calculateMultiplier(double startLevel, double endLevel, unsigned long long lengthInSamples);
   double getStageValue(EnvelopeStage stage);
   unsigned long long currentSampleIndex;
